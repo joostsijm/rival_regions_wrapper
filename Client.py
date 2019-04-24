@@ -1,6 +1,8 @@
 import asyncio
 from webbot.webbot import Browser
 import time
+from lxml import html
+from lxml import etree
 import requests
 from requests_futures import sessions
 import re
@@ -15,6 +17,22 @@ class Client:
         self.username = username
         self.password = password
         self.expires = expires
+        self.resource_id = {'oil': 3,
+                            'ore': 4,
+                            'uranium': 11,
+                            'diamond': 15,
+                            'liquid oxygen': 21,
+                            'helium-3': 24,
+                            'antirad': 13,
+                            'energy drink': 17,
+                            'spacerockets': 20,
+                            'tanks': 2,
+                            'aircrafts': 1,
+                            'missiles': 14,
+                            'bombers': 16,
+                            'battleships': 18,
+                            'moon tanks': 22,
+                            'space stations': 23}
         self.session_id = None
         self.c = None
         self.show_window = show_window
@@ -96,11 +114,43 @@ class Client:
                                                                    'title': title,
                                                                    'region': region})
 
+    def market_info(self, resource, r_id=False):
+        """
+        Returns a list of data about current resource market state.
+        In form price, amount selling, player id, player name string, total offers on market.
+        """
 
-        #f"lang={article_lang}&newspaper={paper_id}&category={category}&paper={article}&title={title}&region={region}&c={self.c}")
-        print(r.text)
+        if not r_id:
+            res_id = self.resource_id[resource]
+        else:
+            res_id = resource
+        r = self.s.get(f'http://rivalregions.com/storage/market/{res_id}?{self.c}')
+        return self.parse_market_response(r, res_id)
 
-    async def do_something(self):
-        #TODO Get some request done
-        pass
+    def get_all_market_info(self):
+        session = sessions.FuturesSession(session=self.s)
+        results = {}
+        for type_ in self.resource_id:
+            if type_ == 'energy drink':
+                continue
+            results[type_] = session.get(f'http://rivalregions.com/storage/market/{self.resource_id[type_]}?{self.c}')
+        for res in results:
+            r = results[res].result()
+            price, selling_amount, player_id, player_name, total_offers = self.parse_market_response(r, self.resource_id[res])
+            results[res] = {'price': price,
+                            'amount': selling_amount,
+                            'player_id': player_id,
+                            'player_name': player_name,
+                            'total_offers':total_offers}
+        return results
+
+    @staticmethod
+    def parse_market_response(r, res_id):
+        price = re.search('<input price="(.*)" type', r.text).group(1)
+        selling_amount = re.search('<span max="(.*)" url="', r.text).group(1)
+        player_id = re.search('<span action="slide/profile/(.*)" class="storage_see pointer dot hov2', r.text).group(1)
+        player_name = re.search(f'<span action="slide/profile/{player_id}" class="storage_see pointer dot hov2">(.*)</span>', r.text).group(1)
+        total_offers = re.search(f'Best offer out of <span action="storage/listed/{res_id}" class="storage_see pointer hov2"><span class="dot">(.*)</span></span>:', r.text).group(1)
+        return price, selling_amount, player_id, player_name, total_offers
+
 
