@@ -7,3 +7,5 @@ A Python Bot for Rival Regions
 Current features:
 - Login
 - Post an article.
+
+[Link to Discord!](https://discord.gg/6fzHtJM)
