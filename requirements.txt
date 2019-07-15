@@ -1,4 +1,0 @@
-requests_futures
-webbot
-lxml
-requests
