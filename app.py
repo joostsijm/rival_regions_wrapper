@@ -1,15 +1,25 @@
 """Test module"""
 
-from rival_regins_wrapper import Client
+import sys
+import json
+
+from rival_regions_wrapper import Client
 
 
-def main():
+def read_credentials(filename):
+    """Read credentials from filename"""
+    with open(filename) as credential_file:
+        return json.load(credential_file)
+
+def login(credentials=None):
     """Main method"""
-    user = input("User: ")
-    passw = input("Pass: ")
-    method = input("Method: ")
+    if credentials is None:
+        credentials = {}
+        credentials['username'] = input("Username: ")
+        credentials['password'] = input("Password: ")
+        credentials['method'] = input("Login Method: ")
 
-    client = Client(method, user, passw, show_window=True)
+    client = Client(credentials, show_window=True)
     print(client.var_c)
 
     action = input("Action: ")
@@ -37,4 +47,8 @@ def article(client):
     client.create_article("Test", "Whoops")
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) >= 2:
+        CREDENTIALS = read_credentials(sys.argv[1])
+        login(CREDENTIALS)
+    else:
+        login()
