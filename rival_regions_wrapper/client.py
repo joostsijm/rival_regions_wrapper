@@ -62,9 +62,7 @@ class Client:
 
     def login(self):
         """Login user"""
-        LOGGER.info('Login in "%s"', self.username)
-        login_method = self.login_method
-        self.session = requests.Session()
+        LOGGER.info('Login as "%s"', self.username)
         auth_text = requests.get("http://rivalregions.com").text
         web = Browser(showWindow=self.show_window)
 
@@ -77,10 +75,10 @@ class Client:
             'facebook': self.login_facebook,
         }
 
-        if login_method in method_dict:
-            web = method_dict[login_method](web, auth_text)
+        if self.login_method in method_dict:
+            web = method_dict[self.login_method](web, auth_text)
         else:
-            LOGGER.info('Invallid loggin method "%s"', login_method)
+            LOGGER.info('Invallid loggin method "%s"', self.login_method)
         time.sleep(5)
 
         LOGGER.info('Get cookie')
@@ -93,10 +91,19 @@ class Client:
 
         web.close_current_tab()
         LOGGER.info('closing login tab')
+        self.session = requests.Session()
         self.expires = expires
         self.session_id = sessid
         self.session.cookies.set(**sessid)
-        self.set_var_c()
+
+        LOGGER.info('set the var_c')
+        response = self.session.get('http://rivalregions.com/#overview')
+        lines = response.text.split("\n")
+        for line in lines:
+            if re.match("(.*)var c_html(.*)", line):
+                self.var_c = line.split("'")[-2]
+                return
+
 
     def login_google(self, web, auth_text):
         """login using Google"""
@@ -142,15 +149,6 @@ class Client:
         web.click(css_selector='.sa_sn.imp.float_left')
         return web
 
-    def set_var_c(self):
-        """Set var_c"""
-        LOGGER.info('set the var_c')
-        response = self.session.get('http://rivalregions.com/#overview')
-        lines = response.text.split("\n")
-        for line in lines:
-            if re.match("(.*)var c_html(.*)", line):
-                self.var_c = line.split("'")[-2]
-                return
 
     def create_article(
             self,
