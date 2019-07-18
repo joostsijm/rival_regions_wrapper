@@ -107,9 +107,10 @@ class Client:
         web.go_to(auth_text2[0])
         web.type(self.username, into='Email')
         web.click('Volgende')
-        time.sleep(5)
+        time.sleep(2)
         web.type(self.password, into='Password')
         web.click('Volgende')
+        time.sleep(2)
 
         web.click(css_selector=".sa_sn.float_left.imp.gogo")
         return web
@@ -145,12 +146,9 @@ class Client:
         """Set var_c"""
         LOGGER.info('set the var_c')
         response = self.session.get('http://rivalregions.com/#overview')
-        print(response.status_code)
         lines = response.text.split("\n")
-        print(lines)
         for line in lines:
             if re.match("(.*)var c_html(.*)", line):
-                print(line)
                 self.var_c = line.split("'")[-2]
                 return
 

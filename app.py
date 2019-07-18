@@ -25,6 +25,7 @@ def login(credentials=None):
     action = input("Action: ")
     action_dict = {
         "market": market,
+        "oil_market": oil_market,
         "article": article
     }
 
@@ -33,7 +34,6 @@ def login(credentials=None):
 
 def market(client):
     """Get all market prices"""
-    # print(client.market_info('oil'))
     market_info = client.get_all_market_info()
     for i in market_info:
         print("")
@@ -41,6 +41,10 @@ def market(client):
         print("#"*len(i))
         for j in market_info[i]:
             print(j.upper() + ':' + market_info[i][j])
+
+def oil_market(client):
+    """Get oil market price"""
+    print(client.market_info('oil'))
 
 def article(client):
     """Create article"""
