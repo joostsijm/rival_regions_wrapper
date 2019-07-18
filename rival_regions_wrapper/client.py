@@ -45,14 +45,13 @@ class Client:
         'moon tanks': 22,
         'space stations': 23
     }
-    session_id = None
+    cookie = None
     var_c = None
 
-    def __init__(self, credentials, expires=None, show_window=False):
+    def __init__(self, credentials, show_window=False):
         self.login_method = credentials['login_method']
         self.username = credentials['username']
         self.password = credentials['password']
-        self.expires = expires
         self.show_window = show_window
         LOGGER.info('Init client login_method "%s" username "%s"', self.login_method, self.username)
         if self.login_method in ["g", "google", "v", "vk", "f", "facebook"]:
@@ -82,19 +81,17 @@ class Client:
         time.sleep(5)
 
         LOGGER.info('Get cookie')
-        sessid = web.get_cookie('PHPSESSID')
-
-        expires = sessid.get('expiry', None)
-        sessid.pop('expiry', None)
-        sessid.pop('httpOnly', None)
-        sessid['expires'] = expires
+        phpsessid = web.get_cookie('PHPSESSID')
+        cookie = self.create_cookie(
+            phpsessid.get('expiry', None),
+            phpsessid.get('value', None)
+        )
+        self.cookie = cookie
 
         web.close_current_tab()
         LOGGER.info('closing login tab')
         self.session = requests.Session()
-        self.expires = expires
-        self.session_id = sessid
-        self.session.cookies.set(**sessid)
+        self.session.cookies.set(**cookie)
 
         LOGGER.info('set the var_c')
         response = self.session.get('http://rivalregions.com/#overview')
@@ -102,8 +99,6 @@ class Client:
         for line in lines:
             if re.match("(.*)var c_html(.*)", line):
                 self.var_c = line.split("'")[-2]
-                return
-
 
     def login_google(self, web, auth_text):
         """login using Google"""
@@ -149,6 +144,17 @@ class Client:
         web.click(css_selector='.sa_sn.imp.float_left')
         return web
 
+    @staticmethod
+    def create_cookie(expires, value):
+        """Create cookie"""
+        return {
+            'domain': 'rivalregions.com',
+            'name': 'PHPSESSID',
+            'path': '/',
+            'secure': False,
+            'expires': expires,
+            'value': value,
+        }
 
     def create_article(
             self,
