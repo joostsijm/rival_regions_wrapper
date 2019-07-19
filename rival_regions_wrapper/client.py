@@ -7,6 +7,7 @@ import logging
 import re
 import time
 import requests
+from datetime import datetime
 import json
 from webbot.webbot import Browser
 from requests_futures import sessions
@@ -167,7 +168,6 @@ class Client:
             'expires': cookie['expires'],
             'value': cookie['value'],
         }
-        print(cookies)
         with open('cookies.json', 'w+') as cookies_file:
             json.dump(cookies, cookies_file)
         LOGGER.info('Saved cookie for "%s"', username)
@@ -175,19 +175,21 @@ class Client:
     @classmethod
     def get_cookie(cls, username):
         """Read cookies for username"""
-        LOGGER.info('Read cookie for')
+        LOGGER.info('Read cookie for "%s"', username)
         try:
             with open('cookies.json', 'r') as cookies_file:
                 cookies = json.load(cookies_file)
                 for cookie_username, cookie in cookies.items():
                     if cookie_username == username:
-                        LOGGER.info('Found cookie for %s', username)
-                        print("found %s" % username)
+                        LOGGER.info('Found cookie')
+                        expires = datetime.fromtimestamp(int(cookie['expires'])) 
+                        if datetime.now() >= expires:
+                            LOGGER.info('Cookie is expired')
+                            return None
                         cookie = cls.create_cookie(
                             cookie['expires'],
                             cookie['value'],
                         )
-                        print(cookie)
                         return cookie
         except FileNotFoundError:
             pass
