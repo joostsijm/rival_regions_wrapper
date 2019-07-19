@@ -19,7 +19,8 @@ def login(credentials=None):
         credentials['password'] = input("Password: ")
         credentials['method'] = input("Login Method: ")
 
-    client = Client(credentials, show_window=True)
+    client = Client(show_window=True)
+    client.login(credentials)
     print(client.var_c)
 
     action = input("Action: ")

@@ -7,6 +7,7 @@ import logging
 import re
 import time
 import requests
+import json
 from webbot.webbot import Browser
 from requests_futures import sessions
 
@@ -47,49 +48,57 @@ class Client:
     }
     cookie = None
     var_c = None
+    login_method = None
+    username = None
+    password = None
+    session = None
 
-    def __init__(self, credentials, show_window=False):
+    def __init__(self, show_window=False):
+        self.show_window = show_window
+        LOGGER.info('Init client, show window %s', self.show_window)
+
+    def login(self, credentials):
+        """Login user"""
         self.login_method = credentials['login_method']
         self.username = credentials['username']
         self.password = credentials['password']
-        self.show_window = show_window
-        LOGGER.info('Init client login_method "%s" username "%s"', self.login_method, self.username)
-        if self.login_method in ["g", "google", "v", "vk", "f", "facebook"]:
-            self.login()
-        else:
-            raise RRClientException("Not a valid login method.")
 
-    def login(self):
-        """Login user"""
-        LOGGER.info('Login as "%s"', self.username)
-        auth_text = requests.get("http://rivalregions.com").text
-        web = Browser(showWindow=self.show_window)
+        cookie = self.get_cookie(self.username)
+        if cookie is None:
+            LOGGER.info('Client login "%s" username "%s"', self.login_method, self.username)
+            if self.login_method not in ["g", "google", "v", "vk", "f", "facebook"]:
+                raise RRClientException("Not a valid login method.")
 
-        method_dict = {
-            'g': self.login_google,
-            'google': self.login_google,
-            'v': self.login_vk,
-            'vk': self.login_vk,
-            'f': self.login_facebook,
-            'facebook': self.login_facebook,
-        }
+            auth_text = requests.get("http://rivalregions.com").text
+            web = Browser(showWindow=self.show_window)
 
-        if self.login_method in method_dict:
-            web = method_dict[self.login_method](web, auth_text)
-        else:
-            LOGGER.info('Invallid loggin method "%s"', self.login_method)
-        time.sleep(5)
+            method_dict = {
+                'g': self.login_google,
+                'google': self.login_google,
+                'v': self.login_vk,
+                'vk': self.login_vk,
+                'f': self.login_facebook,
+                'facebook': self.login_facebook,
+            }
 
-        LOGGER.info('Get cookie')
-        phpsessid = web.get_cookie('PHPSESSID')
-        cookie = self.create_cookie(
-            phpsessid.get('expiry', None),
-            phpsessid.get('value', None)
-        )
+            if self.login_method in method_dict:
+                web = method_dict[self.login_method](web, auth_text)
+            else:
+                LOGGER.info('Invallid loggin method "%s"', self.login_method)
+                exit()
+            time.sleep(5)
+
+            LOGGER.info('Get cookie')
+            phpsessid = web.get_cookie('PHPSESSID')
+            cookie = self.create_cookie(
+                phpsessid.get('expiry', None),
+                phpsessid.get('value', None)
+            )
+            self.write_cookie(self.username, cookie)
+            LOGGER.info('closing login tab')
+            web.close_current_tab()
+
         self.cookie = cookie
-
-        web.close_current_tab()
-        LOGGER.info('closing login tab')
         self.session = requests.Session()
         self.session.cookies.set(**cookie)
 
@@ -143,6 +152,46 @@ class Client:
         time.sleep(5)
         web.click(css_selector='.sa_sn.imp.float_left')
         return web
+
+    @classmethod
+    def write_cookie(cls, username, cookie):
+        """Write cookie to file"""
+        LOGGER.info('Saving cookie for "%s"', username)
+        cookies = None
+        try:
+            with open('cookies.json', 'r') as cookies_file:
+                cookies = json.load(cookies_file)
+        except FileNotFoundError:
+            cookies = {}
+        cookies[username] = {
+            'expires': cookie['expires'],
+            'value': cookie['value'],
+        }
+        print(cookies)
+        with open('cookies.json', 'w+') as cookies_file:
+            json.dump(cookies, cookies_file)
+        LOGGER.info('Saved cookie for "%s"', username)
+
+    @classmethod
+    def get_cookie(cls, username):
+        """Read cookies for username"""
+        LOGGER.info('Read cookie for')
+        try:
+            with open('cookies.json', 'r') as cookies_file:
+                cookies = json.load(cookies_file)
+                for cookie_username, cookie in cookies.items():
+                    if cookie_username == username:
+                        LOGGER.info('Found cookie for %s', username)
+                        print("found %s" % username)
+                        cookie = cls.create_cookie(
+                            cookie['expires'],
+                            cookie['value'],
+                        )
+                        print(cookie)
+                        return cookie
+        except FileNotFoundError:
+            pass
+        return None
 
     @staticmethod
     def create_cookie(expires, value):
