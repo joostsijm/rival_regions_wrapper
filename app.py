@@ -23,15 +23,21 @@ def login(credentials=None):
     client.login(credentials)
     print(client.var_c)
 
-    action = input("Action: ")
     action_dict = {
-        "market": market,
-        "oil_market": oil_market,
-        "article": article
+        'market': market,
+        'oil_market': oil_market,
+        'article': article,
+        'get': get,
+        'gold_exploration': gold_exploration,
+        'vote_law': vote_law,
     }
-
-    if action in action_dict:
-        action_dict[action](client)
+    print(action_dict.keys())
+    while True:
+        action = input("Action: ")
+        if action in action_dict:
+            action_dict[action](client)
+        else:
+            print('action not found')
 
 def market(client):
     """Get all market prices"""
@@ -49,7 +55,39 @@ def oil_market(client):
 
 def article(client):
     """Create article"""
-    client.create_article("Test", "Whoops")
+    client.create_article('Nothing to see here', '')
+
+def get(client):
+    """Send get request from client"""
+    path = input('Path: ')
+    result = client.get(path)
+    print(result)
+
+def gold_exploration(client):
+    """Create gold exploration law"""
+    resoure = 0
+    data = {
+        'tmp_gov': resoure
+    }
+    result = client.post('parliament/donew/42/{}/0'.format(resoure), data)
+    print(result)
+
+def vote_law(client):
+    """Vote for a law"""
+    # p400220003260451563564814
+    # p4002 2000326045 1563564814
+    # 'parliament/votelaw/4002/2000326045/1563564814/pro'
+    # 'parliament/votelaw/4002/2000326045/1563565114/pro'
+    region_id = 4002
+    player_id = 2000326045
+    law_id = 1563565114
+    result = client.post('parliament/votelaw/{}/{}/{}/pro'.format(
+        region_id,
+        player_id,
+        law_id
+    ), {})
+    print(result)
+    
 
 if __name__ == "__main__":
     if len(sys.argv) >= 2:
