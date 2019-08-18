@@ -26,6 +26,23 @@ class RRClientException(Exception):
         Exception.__init__(self, *args, **kwargs)
         LOGGER.warning('RRClientException')
 
+class SessionExpireException(Exception):
+    """Raise when session has expired"""
+    def __init__(self, *args, **kwargs):
+        Exception.__init__(self, *args, **kwargs)
+        LOGGER.warning('Session has expired')
+
+def session_handler(func):
+    """Handle expired sessions"""
+    def wrapper(*args, **kwargs):
+        instance = args[0]
+        try:
+            return func(*args, **kwargs)
+        except SessionExpireException:
+            instance.remove_cookie(instance.username)
+            instance.login()
+            return func(*args, **kwargs)
+    return wrapper
 
 class Client:
     """class for RR client"""
@@ -58,11 +75,12 @@ class Client:
         self.show_window = show_window
         LOGGER.info('Init client, show window %s', self.show_window)
 
-    def login(self, credentials):
+    def login(self, credentials=None):
         """Login user"""
-        self.login_method = credentials['login_method']
-        self.username = credentials['username']
-        self.password = credentials['password']
+        if credentials:
+            self.login_method = credentials['login_method']
+            self.username = credentials['username']
+            self.password = credentials['password']
 
         cookie = self.get_cookie(self.username)
         if cookie is None:
@@ -108,6 +126,8 @@ class Client:
         lines = response.text.split("\n")
         for line in lines:
             if re.match("(.*)var c_html(.*)", line):
+                var_c = line.split("'")[-2]
+                LOGGER.info('var_c: {}'.format(var_c))
                 self.var_c = line.split("'")[-2]
 
     def login_google(self, web, auth_text):
@@ -119,10 +139,10 @@ class Client:
         web.go_to(auth_text2[0])
         web.type(self.username, into='Email')
         web.click('Volgende')
-        time.sleep(2)
+        time.sleep(4)
         web.type(self.password, into='Password')
         web.click('Volgende')
-        time.sleep(2)
+        time.sleep(4)
 
         web.click(css_selector=".sa_sn.float_left.imp.gogo")
         return web
@@ -195,6 +215,21 @@ class Client:
             pass
         return None
 
+    @classmethod
+    def remove_cookie(cls, username):
+        """Remove cookie from storage"""
+        LOGGER.info('Removing cookie for "%s"', username)
+        cookies = None
+        try:
+            with open('cookies.json', 'r') as cookies_file:
+                cookies = json.load(cookies_file)
+        except FileNotFoundError:
+            cookies = {}
+        cookies.pop(username, None)
+        with open('cookies.json', 'w+') as cookies_file:
+            json.dump(cookies, cookies_file)
+        LOGGER.info('Removed cookie for "%s"', username)
+
     @staticmethod
     def create_cookie(expires, value):
         """Create cookie"""
@@ -207,6 +242,7 @@ class Client:
             'value': value,
         }
 
+    @session_handler
     def get(self, path):
         """Send get request to Rival Regions"""
         if path[0] == '/':
@@ -215,9 +251,12 @@ class Client:
         response = self.session.get(
             'http://rivalregions.com/{}'.format(path)
         )
-        return response.content
+        if "Session expired, please, reload the page" in response.text:
+            raise SessionExpireException()
+        return response.text
 
-    def post(self, path, data):
+    @session_handler
+    def post(self, path, data=None):
         """Send post request to Rival Regions"""
         if path[0] == '/':
             path = path[1:]
@@ -227,4 +266,6 @@ class Client:
             "http://rivalregions.com/{}".format(path),
             data=data
         )
+        if "Session expired, please, reload the page" in response.text:
+            raise SessionExpireException()
         return response.text
