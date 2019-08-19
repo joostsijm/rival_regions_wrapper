@@ -6,11 +6,10 @@ Client module
 import logging
 import re
 import time
-import requests
 from datetime import datetime
 import json
+import requests
 from webbot.webbot import Browser
-from requests_futures import sessions
 
 
 logging.basicConfig(
@@ -38,7 +37,7 @@ def session_handler(func):
         instance = args[0]
         try:
             return func(*args, **kwargs)
-        except SessionExpireException:
+        except (SessionExpireException, ConnectionError):
             instance.remove_cookie(instance.username)
             instance.login()
             return func(*args, **kwargs)
@@ -127,7 +126,7 @@ class Client:
         for line in lines:
             if re.match("(.*)var c_html(.*)", line):
                 var_c = line.split("'")[-2]
-                LOGGER.info('var_c: {}'.format(var_c))
+                LOGGER.info('var_c: %s', var_c)
                 self.var_c = line.split("'")[-2]
 
     def login_google(self, web, auth_text):
@@ -202,7 +201,7 @@ class Client:
                 for cookie_username, cookie in cookies.items():
                     if cookie_username == username:
                         LOGGER.info('Found cookie')
-                        expires = datetime.fromtimestamp(int(cookie['expires'])) 
+                        expires = datetime.fromtimestamp(int(cookie['expires']))
                         if datetime.now() >= expires:
                             LOGGER.info('Cookie is expired')
                             return None
