@@ -37,7 +37,7 @@ def session_handler(func):
         instance = args[0]
         try:
             return func(*args, **kwargs)
-        except (SessionExpireException, ConnectionError):
+        except (SessionExpireException, ConnectionError, ConnectionResetError):
             instance.remove_cookie(instance.username)
             instance.login()
             return func(*args, **kwargs)
