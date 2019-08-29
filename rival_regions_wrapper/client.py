@@ -13,7 +13,7 @@ from webbot.webbot import Browser
 
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format='%(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 LOGGER = logging.getLogger(__name__)
@@ -25,11 +25,20 @@ class RRClientException(Exception):
         Exception.__init__(self, *args, **kwargs)
         LOGGER.warning('RRClientException')
 
+
 class SessionExpireException(Exception):
     """Raise when session has expired"""
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
         LOGGER.warning('Session has expired')
+
+
+class NoLogginException(Exception):
+    """Raise exception when client isn't logged in"""
+    def __init__(self, *args, **kwargs):
+        Exception.__init__(self, *args, **kwargs)
+        LOGGER.warning('Session has expired')
+
 
 def session_handler(func):
     """Handle expired sessions"""
@@ -39,6 +48,9 @@ def session_handler(func):
             return func(*args, **kwargs)
         except (SessionExpireException, ConnectionError, ConnectionResetError):
             instance.remove_cookie(instance.username)
+            instance.login()
+            return func(*args, **kwargs)
+        except NoLogginException:
             instance.login()
             return func(*args, **kwargs)
     return wrapper
@@ -74,13 +86,15 @@ class Client:
         self.show_window = show_window
         LOGGER.info('Init client, show window %s', self.show_window)
 
-    def login(self, credentials=None):
-        """Login user"""
-        if credentials:
-            self.login_method = credentials['login_method']
-            self.username = credentials['username']
-            self.password = credentials['password']
+    def set_credentials(self, credentials):
+        """Set the credentials"""
+        LOGGER.info('Setting "%s" credentials', credentials['username'])
+        self.login_method = credentials['login_method']
+        self.username = credentials['username']
+        self.password = credentials['password']
 
+    def login(self):
+        """Login user if needed"""
         cookie = self.get_cookie(self.username)
         if cookie is None:
             LOGGER.info('Client login "%s" username "%s"', self.login_method, self.username)
@@ -118,6 +132,8 @@ class Client:
 
         self.cookie = cookie
         self.session = requests.Session()
+        self.session.headers.update({'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)' \
+            'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36'}) 
         self.session.cookies.set(**cookie)
 
         LOGGER.info('set the var_c')
@@ -247,11 +263,14 @@ class Client:
         if path[0] == '/':
             path = path[1:]
         LOGGER.info('GET: %s', path)
-        response = self.session.get(
-            'http://rivalregions.com/{}'.format(path)
-        )
-        if "Session expired, please, reload the page" in response.text:
-            raise SessionExpireException()
+        if self.session:
+            response = self.session.get(
+                'http://rivalregions.com/{}'.format(path)
+            )
+            if "Session expired, please, reload the page" in response.text:
+                raise SessionExpireException()
+        else:
+            raise NoLogginException()
         return response.text
 
     @session_handler
@@ -261,10 +280,13 @@ class Client:
             path = path[1:]
         data['c'] = self.var_c
         LOGGER.info('POST: %s', path)
-        response = self.session.post(
-            "http://rivalregions.com/{}".format(path),
-            data=data
-        )
-        if "Session expired, please, reload the page" in response.text:
-            raise SessionExpireException()
+        if self.session:
+            response = self.session.post(
+                "http://rivalregions.com/{}".format(path),
+                data=data
+            )
+            if "Session expired, please, reload the page" in response.text:
+                raise SessionExpireException()
+        else:
+            raise NoLogginException()
         return response.text
