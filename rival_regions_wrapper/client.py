@@ -133,7 +133,7 @@ class Client:
         self.cookie = cookie
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)' \
-            'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36'}) 
+            'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36'})
         self.session.cookies.set(**cookie)
 
         LOGGER.info('set the var_c')
@@ -290,3 +290,22 @@ class Client:
         else:
             raise NoLogginException()
         return response.text
+
+    @session_handler
+    def send_chat(self, language, message):
+        """send chat message"""
+        if self.session:
+            response = self.session.get("http://rivalregions.com/#overview")
+            if "Session expired, please, reload the page" in response.text:
+                raise SessionExpireException()
+            web = Browser(showWindow=self.show_window)
+            web.go_to('http://rivalregions.com/')
+            web.add_cookie(self.get_cookie(self.username))
+            web.go_to('http://rivalregions.com/#slide/chat/lang_{}'.format(language))
+            web.refresh()
+            time.sleep(2)
+            web.type(message, id='message')
+            web.click(id='chat_send')
+            web.close_current_tab()
+        else:
+            raise NoLogginException()
