@@ -44,15 +44,19 @@ def session_handler(func):
     """Handle expired sessions"""
     def wrapper(*args, **kwargs):
         instance = args[0]
+        return try_run(instance, func, *args, **kwargs)
+
+    def try_run(instance, func, *args, **kwargs):
         try:
             return func(*args, **kwargs)
         except (SessionExpireException, ConnectionError, ConnectionResetError):
             instance.remove_cookie(instance.username)
             instance.login()
-            return func(*args, **kwargs)
+            return try_run(instance, func, *args, **kwargs)
         except NoLogginException:
             instance.login()
-            return func(*args, **kwargs)
+            return try_run(instance, func, *args, **kwargs)
+
     return wrapper
 
 class Client:
@@ -152,11 +156,14 @@ class Client:
         auth_text2 = auth_text1[1].split('" class="sa')
 
         web.go_to(auth_text2[0])
+        LOGGER.info('Typing in username')
         web.type(self.username, into='Email')
         web.click('Volgende')
         time.sleep(4)
+        LOGGER.info('Typing in password')
         web.type(self.password, into='Password')
         web.click('Volgende')
+        LOGGER.info('waiting for login to finish')
         time.sleep(4)
 
         web.click(css_selector=".sa_sn.float_left.imp.gogo")
@@ -258,14 +265,19 @@ class Client:
         }
 
     @session_handler
-    def get(self, path):
+    def get(self, path, add_var_c):
         """Send get request to Rival Regions"""
         if path[0] == '/':
             path = path[1:]
-        LOGGER.info('GET: %s', path)
+
+        params = {}
+        if add_var_c:
+            params['c'] = self.var_c
+
         if self.session:
             response = self.session.get(
-                'http://rivalregions.com/{}'.format(path)
+                url='http://rivalregions.com/{}'.format(path),
+                params=params
             )
             if "Session expired, please, reload the page" in response.text:
                 raise SessionExpireException()
@@ -279,7 +291,6 @@ class Client:
         if path[0] == '/':
             path = path[1:]
         data['c'] = self.var_c
-        LOGGER.info('POST: %s', path)
         if self.session:
             response = self.session.post(
                 "http://rivalregions.com/{}".format(path),
