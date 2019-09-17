@@ -265,7 +265,7 @@ class Client:
         }
 
     @session_handler
-    def get(self, path, add_var_c):
+    def get(self, path, add_var_c=False):
         """Send get request to Rival Regions"""
         if path[0] == '/':
             path = path[1:]
