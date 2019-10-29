@@ -171,6 +171,7 @@ class Client:
         web.type(self.password, css_selector="input")
         web.click('Inloggen')
         web.click(css_selector=".sa_sn.float_left.imp.gogo")
+        time.sleep(1)
         return web
 
     def login_vk(self, web, auth_text):
