@@ -8,6 +8,7 @@ import re
 import time
 from datetime import datetime
 import json
+
 import requests
 from webbot.webbot import Browser
 
@@ -39,6 +40,11 @@ class NoLogginException(Exception):
         Exception.__init__(self, *args, **kwargs)
         LOGGER.warning('Session has expired')
 
+class NoPHPsessidException(Exception):
+    """Raise exception when cookie isn't found"""
+    def __init__(self, *args, **kwargs):
+        Exception.__init__(self, *args, **kwargs)
+        LOGGER.warning('No phpsessid found')
 
 def session_handler(func):
     """Handle expired sessions"""
@@ -122,15 +128,17 @@ class Client:
             else:
                 LOGGER.info('Invallid loggin method "%s"', self.login_method)
                 exit()
-            time.sleep(5)
 
             LOGGER.info('Get cookie')
             phpsessid = web.get_cookie('PHPSESSID')
-            cookie = self.create_cookie(
-                phpsessid.get('expiry', None),
-                phpsessid.get('value', None)
-            )
-            self.write_cookie(self.username, cookie)
+            if phpsessid:
+                cookie = self.create_cookie(
+                    phpsessid.get('expiry', None),
+                    phpsessid.get('value', None)
+                )
+                self.write_cookie(self.username, cookie)
+            else:
+                raise NoPHPsessidException()
             LOGGER.info('closing login tab')
             web.close_current_tab()
 
@@ -159,13 +167,9 @@ class Client:
         LOGGER.info('Typing in username')
         web.type(self.username, into='Email')
         web.click('Volgende')
-        time.sleep(4)
         LOGGER.info('Typing in password')
-        web.type(self.password, into='Password')
-        web.click('Volgende')
-        LOGGER.info('waiting for login to finish')
-        time.sleep(4)
-
+        web.type(self.password, css_selector="input")
+        web.click('Inloggen')
         web.click(css_selector=".sa_sn.float_left.imp.gogo")
         return web
 
