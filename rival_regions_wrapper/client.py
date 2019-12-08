@@ -10,6 +10,7 @@ from datetime import datetime
 import json
 
 import requests
+import cloudscraper
 from webbot.webbot import Browser
 
 
@@ -142,10 +143,18 @@ class Client:
             LOGGER.info('closing login tab')
             web.close_current_tab()
 
-        self.cookie = cookie
+        # old
         self.session = requests.Session()
+        # new to bypass cloudflare
+#        self.session = cloudscraper.CloudScraper(
+#            browser={'browser': 'chrome', 'mobile': False},
+#            # debug=False
+#            debug=True
+#        )
+        # not required
         self.session.headers.update({'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)' \
             'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36'})
+        self.cookie = cookie
         self.session.cookies.set(**cookie)
 
         LOGGER.info('set the var_c')
@@ -167,6 +176,7 @@ class Client:
         LOGGER.info('Typing in username')
         web.type(self.username, into='Email')
         web.click('Volgende')
+        time.sleep(2)
         LOGGER.info('Typing in password')
         web.type(self.password, css_selector="input")
         web.click('Inloggen')
@@ -301,6 +311,9 @@ class Client:
                 "http://rivalregions.com/{}".format(path),
                 data=data
             )
+            print(response.headers)
+            print(response.text)
+            print(response.status_code)
             if "Session expired, please, reload the page" in response.text:
                 raise SessionExpireException()
         else:
