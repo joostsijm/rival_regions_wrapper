@@ -10,7 +10,7 @@ requests-futures = "*"
 webbot = "*"
 lxml = "*"
 requests = "*"
-cloudscraper = "*"
+cfscrape = "*"
 
 [requires]
 python_version = "3"
