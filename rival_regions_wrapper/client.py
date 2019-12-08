@@ -3,6 +3,7 @@
 Client module
 """
 
+import sys
 import logging
 import re
 import time
@@ -10,7 +11,7 @@ from datetime import datetime
 import json
 
 import requests
-import cloudscraper
+import cfscrape
 from webbot.webbot import Browser
 
 
@@ -112,7 +113,7 @@ class Client:
             if self.login_method not in ["g", "google", "v", "vk", "f", "facebook"]:
                 raise RRClientException("Not a valid login method.")
 
-            auth_text = requests.get("http://rivalregions.com").text
+            auth_text = requests.get("https://rivalregions.com").text
             web = Browser(showWindow=self.show_window)
 
             method_dict = {
@@ -128,7 +129,7 @@ class Client:
                 web = method_dict[self.login_method](web, auth_text)
             else:
                 LOGGER.info('Invallid loggin method "%s"', self.login_method)
-                exit()
+                sys.exit()
 
             LOGGER.info('Get cookie')
             phpsessid = web.get_cookie('PHPSESSID')
@@ -143,22 +144,24 @@ class Client:
             LOGGER.info('closing login tab')
             web.close_current_tab()
 
-        # old
-        self.session = requests.Session()
         # new to bypass cloudflare
-#        self.session = cloudscraper.CloudScraper(
-#            browser={'browser': 'chrome', 'mobile': False},
-#            # debug=False
-#            debug=True
-#        )
-        # not required
-        self.session.headers.update({'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)' \
-            'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36'})
+        self.session = cfscrape.CloudflareScraper()
+        # cloudscraper
+        # self.session = cloudscraper.CloudScraper(
+        #     browser={'browser': 'chrome', 'mobile': False},
+        #     interpreter='nodejs',
+        #     # debug=False
+        #     debug=True
+        # )
+        # old
+        # self.session = requests.Session()
+        # self.session.headers.update({'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)' \
+        #     'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36'})
         self.cookie = cookie
         self.session.cookies.set(**cookie)
 
         LOGGER.info('set the var_c')
-        response = self.session.get('http://rivalregions.com/#overview')
+        response = self.session.get('https://rivalregions.com/#overview')
         lines = response.text.split("\n")
         for line in lines:
             if re.match("(.*)var c_html(.*)", line):
@@ -291,7 +294,7 @@ class Client:
 
         if self.session:
             response = self.session.get(
-                url='http://rivalregions.com/{}'.format(path),
+                url='https://rivalregions.com/{}'.format(path),
                 params=params
             )
             if "Session expired, please, reload the page" in response.text:
@@ -308,12 +311,9 @@ class Client:
         data['c'] = self.var_c
         if self.session:
             response = self.session.post(
-                "http://rivalregions.com/{}".format(path),
+                "https://rivalregions.com/{}".format(path),
                 data=data
             )
-            print(response.headers)
-            print(response.text)
-            print(response.status_code)
             if "Session expired, please, reload the page" in response.text:
                 raise SessionExpireException()
         else:
@@ -324,13 +324,13 @@ class Client:
     def send_chat(self, language, message):
         """send chat message"""
         if self.session:
-            response = self.session.get("http://rivalregions.com/#overview")
+            response = self.session.get("https://rivalregions.com/#overview")
             if "Session expired, please, reload the page" in response.text:
                 raise SessionExpireException()
             web = Browser(showWindow=self.show_window)
-            web.go_to('http://rivalregions.com/')
+            web.go_to('https://rivalregions.com/')
             web.add_cookie(self.get_cookie(self.username))
-            web.go_to('http://rivalregions.com/#slide/chat/lang_{}'.format(language))
+            web.go_to('https://rivalregions.com/#slide/chat/lang_{}'.format(language))
             web.refresh()
             time.sleep(2)
             web.type(message, id='message')
