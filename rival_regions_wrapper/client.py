@@ -14,12 +14,27 @@ import requests
 import cfscrape
 from webbot.webbot import Browser
 
-
-logging.basicConfig(
-    format='%(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
+# get logger
 LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.INFO)
+
+# create file handler
+FILE_HANDLER = logging.FileHandler('output.log')
+FILE_HANDLER.setLevel(logging.DEBUG)
+
+# create console handler
+STREAM_HANDLER = logging.StreamHandler()
+STREAM_HANDLER.setLevel(logging.INFO)
+
+# create formatter and add it to the handlers
+STREAM_FORMATTER = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+STREAM_HANDLER.setFormatter(STREAM_FORMATTER)
+FILE_FORMATTER = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+FILE_HANDLER.setFormatter(FILE_FORMATTER)
+
+# add the handlers to logger
+LOGGER.addHandler(STREAM_HANDLER)
+LOGGER.addHandler(FILE_HANDLER)
 
 
 class RRClientException(Exception):
@@ -42,11 +57,13 @@ class NoLogginException(Exception):
         Exception.__init__(self, *args, **kwargs)
         LOGGER.warning('Session has expired')
 
+
 class NoPHPsessidException(Exception):
     """Raise exception when cookie isn't found"""
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
         LOGGER.warning('No phpsessid found')
+
 
 def session_handler(func):
     """Handle expired sessions"""
@@ -131,7 +148,7 @@ class Client:
                 LOGGER.info('Invallid loggin method "%s"', self.login_method)
                 sys.exit()
 
-            LOGGER.info('Get cookie')
+            LOGGER.debug('Get cookie')
             phpsessid = web.get_cookie('PHPSESSID')
             if phpsessid:
                 cookie = self.create_cookie(
@@ -141,7 +158,7 @@ class Client:
                 self.write_cookie(self.username, cookie)
             else:
                 raise NoPHPsessidException()
-            LOGGER.info('closing login tab')
+            LOGGER.debug('closing login tab')
             web.close_current_tab()
 
         # new to bypass cloudflare
@@ -160,13 +177,13 @@ class Client:
         self.cookie = cookie
         self.session.cookies.set(**cookie)
 
-        LOGGER.info('set the var_c')
+        LOGGER.debug('set the var_c')
         response = self.session.get('https://rivalregions.com/#overview')
         lines = response.text.split("\n")
         for line in lines:
             if re.match("(.*)var c_html(.*)", line):
                 var_c = line.split("'")[-2]
-                LOGGER.info('var_c: %s', var_c)
+                LOGGER.debug('var_c: %s', var_c)
                 self.var_c = line.split("'")[-2]
 
     def login_google(self, web, auth_text):
