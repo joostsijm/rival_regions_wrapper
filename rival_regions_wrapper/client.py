@@ -309,6 +309,7 @@ class Client:
         if add_var_c:
             params['c'] = self.var_c
 
+        LOGGER.debug('GET: %s var_c: %s', path, add_var_c)
         if self.session:
             response = self.session.get(
                 url='https://rivalregions.com/{}'.format(path),
@@ -326,6 +327,8 @@ class Client:
         if path[0] == '/':
             path = path[1:]
         data['c'] = self.var_c
+
+        LOGGER.debug('POST: %s', path)
         if self.session:
             response = self.session.post(
                 "https://rivalregions.com/{}".format(path),
