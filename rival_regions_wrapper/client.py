@@ -16,7 +16,7 @@ from webbot.webbot import Browser
 
 # get logger
 LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.INFO)
+LOGGER.setLevel(logging.DEBUG)
 
 # create file handler
 FILE_HANDLER = logging.FileHandler('output.log')
@@ -315,7 +315,8 @@ class Client:
                 url='https://rivalregions.com/{}'.format(path),
                 params=params
             )
-            if "Session expired, please, reload the page" in response.text:
+            if "Session expired, please, reload the page" in response.text or \
+                    'window.location="https://rivalregions.com";' in response.text:
                 raise SessionExpireException()
         else:
             raise NoLogginException()
@@ -334,7 +335,8 @@ class Client:
                 "https://rivalregions.com/{}".format(path),
                 data=data
             )
-            if "Session expired, please, reload the page" in response.text:
+            if "Session expired, please, reload the page" in response.text or \
+                    'window.location="https://rivalregions.com";' in response.text:
                 raise SessionExpireException()
         else:
             raise NoLogginException()
