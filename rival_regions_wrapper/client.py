@@ -360,3 +360,23 @@ class Client:
             web.close_current_tab()
         else:
             raise NoLogginException()
+
+    @session_handler
+    def send_personal_message(self, user_id, message):
+        """send chat message"""
+        print('send_personal_message to {}'.format(user_id))
+        if self.session:
+            response = self.session.get("https://rivalregions.com/#overview")
+            if "Session expired, please, reload the page" in response.text:
+                raise SessionExpireException()
+            web = Browser(showWindow=self.show_window)
+            web.go_to('https://rivalregions.com/')
+            web.add_cookie(self.get_cookie(self.username))
+            web.go_to('https://rivalregions.com/#messages/{}'.format(user_id))
+            web.refresh()
+            time.sleep(2)
+            web.type(message, id='message')
+            web.click(id='chat_send')
+            web.close_current_tab()
+        else:
+            raise NoLogginException()
