@@ -14,6 +14,7 @@ import requests
 import cfscrape
 from webbot.webbot import Browser
 
+
 # get logger
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
@@ -86,24 +87,6 @@ def session_handler(func):
 
 class Client:
     """class for RR client"""
-    resource_id = {
-        'oil': 3,
-        'ore': 4,
-        'uranium': 11,
-        'diamond': 15,
-        'liquid oxygen': 21,
-        'helium-3': 24,
-        'antirad': 13,
-        'energy drink': 17,
-        'spacerockets': 20,
-        'tanks': 2,
-        'aircrafts': 1,
-        'missiles': 14,
-        'bombers': 16,
-        'battleships': 18,
-        'moon tanks': 22,
-        'space stations': 23
-    }
     cookie = None
     var_c = None
     login_method = None
@@ -161,19 +144,7 @@ class Client:
             LOGGER.debug('closing login tab')
             web.close_current_tab()
 
-        # new to bypass cloudflare
         self.session = cfscrape.CloudflareScraper()
-        # cloudscraper
-        # self.session = cloudscraper.CloudScraper(
-        #     browser={'browser': 'chrome', 'mobile': False},
-        #     interpreter='nodejs',
-        #     # debug=False
-        #     debug=True
-        # )
-        # old
-        # self.session = requests.Session()
-        # self.session.headers.update({'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)' \
-        #     'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36'})
         self.cookie = cookie
         self.session.cookies.set(**cookie)
 
@@ -186,6 +157,7 @@ class Client:
                 LOGGER.debug('var_c: %s', var_c)
                 self.var_c = line.split("'")[-2]
 
+    # This is working
     def login_google(self, web, auth_text):
         """login using Google"""
         LOGGER.info('Login method Google')
@@ -204,6 +176,7 @@ class Client:
         time.sleep(1)
         return web
 
+    # IDK if this is working
     def login_vk(self, web, auth_text):
         """login using VK"""
         LOGGER.info('Login method VK')
@@ -216,6 +189,7 @@ class Client:
         web.click('Log in')
         return web
 
+    # IDK if this is working
     def login_facebook(self, web, auth_text):
         """login using Facebook"""
         LOGGER.info('Login method Facebook')
@@ -364,7 +338,7 @@ class Client:
     @session_handler
     def send_personal_message(self, user_id, message):
         """send chat message"""
-        print('send_personal_message to {}'.format(user_id))
+        LOGGER.info('Sending personal message to %s', user_id)
         if self.session:
             response = self.session.get("https://rivalregions.com/#overview")
             if "Session expired, please, reload the page" in response.text:
