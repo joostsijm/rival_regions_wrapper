@@ -1,5 +1,3 @@
 .venv
-*_credentials.json
-!template_credentials.json
 cookies.json
 __pycache__/
