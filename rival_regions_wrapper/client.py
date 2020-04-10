@@ -171,7 +171,10 @@ class Client:
         time.sleep(2)
         LOGGER.info('Typing in password')
         web.type(self.password, css_selector="input")
-        web.click('Inloggen')
+        if web.exists('Sign in'): # English
+            web.click('Sign in')
+        elif web.exists('Inloggen'): # Dutch
+            web.click('Inloggen')
         web.click(css_selector=".sa_sn.float_left.imp.gogo")
         time.sleep(1)
         return web
