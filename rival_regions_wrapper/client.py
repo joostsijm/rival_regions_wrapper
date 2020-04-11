@@ -377,18 +377,45 @@ class Client:
             time.sleep(2)
 
             character_count = 0
-            tmp_message = ''
+            tmp_messages = []
             for sentence in message.split('\n'):
-                character_count += len(sentence)
+                sentence_character_count = character_count
+                tmp_sentence = []
+                for word in sentence.split(' '):
+                    sentence_character_count += len(word) + 1
+                    if sentence_character_count >= 899:
+                        message = '{}\n{}'.format('\n'.join(tmp_messages), ' '.join(tmp_sentence))
+                        LOGGER.info(
+                            'conference %s: next message length: %s', conference_id, len(message)
+                        )
+                        web.type(message, id='message')
+                        web.click(id='chat_send')
+                        sentence_character_count = 0
+                        tmp_sentence = []
+                        character_count = 0
+                        tmp_messages = []
+                    tmp_sentence.append(word)
+
+                sentence = ' '.join(tmp_sentence)
+                character_count += len(sentence) + 1
                 if character_count >= 900:
-                    web.type(tmp_message, id='message')
+                    message = '\n'.join(tmp_messages)
+                    LOGGER.info(
+                        'conference %s: next message length: %s', conference_id, len(message)
+                    )
+                    LOGGER.info('conference %s: sending next part of message')
+                    web.type(message, id='message')
                     web.click(id='chat_send')
                     character_count = 0
-                    tmp_message = ''
-                tmp_message += '{}\n'.format(sentence)
+                    tmp_messages = []
+                tmp_messages.append(sentence)
 
-            if tmp_message:
-                web.type(tmp_message, id='message')
+            if tmp_messages:
+                message = '\n'.join(tmp_messages)
+                LOGGER.info(
+                    'conference %s: next message length: %s', conference_id, len(message)
+                )
+                web.type(message, id='message')
                 web.click(id='chat_send')
 
             LOGGER.info('conference %s: finished sending message', conference_id)
