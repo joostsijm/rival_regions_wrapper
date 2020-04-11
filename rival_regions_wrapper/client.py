@@ -322,6 +322,7 @@ class Client:
     @session_handler
     def send_chat(self, language, message):
         """send chat message"""
+        LOGGER.info('language %s: start sending message', language)
         if self.session:
             response = self.session.get("https://rivalregions.com/#overview")
             if "Session expired, please, reload the page" in response.text:
@@ -334,6 +335,7 @@ class Client:
             time.sleep(2)
             web.type(message, id='message')
             web.click(id='chat_send')
+            LOGGER.info('language %s: finished sending message', language)
             web.close_current_tab()
         else:
             raise NoLogginException()
@@ -341,7 +343,7 @@ class Client:
     @session_handler
     def send_personal_message(self, user_id, message):
         """send chat message"""
-        LOGGER.info('Sending personal message to %s', user_id)
+        LOGGER.info('user %s: start sending message', user_id)
         if self.session:
             response = self.session.get("https://rivalregions.com/#overview")
             if "Session expired, please, reload the page" in response.text:
@@ -354,6 +356,42 @@ class Client:
             time.sleep(2)
             web.type(message, id='message')
             web.click(id='chat_send')
+            LOGGER.info('user %s: finished sending message', user_id)
+            web.close_current_tab()
+        else:
+            raise NoLogginException()
+
+    @session_handler
+    def send_conference_message(self, conference_id, message):
+        """send chat message"""
+        LOGGER.info('conference %s: start sending message', conference_id)
+        if self.session:
+            response = self.session.get("https://rivalregions.com/#overview")
+            if "Session expired, please, reload the page" in response.text:
+                raise SessionExpireException()
+            web = Browser(showWindow=self.show_window)
+            web.go_to('https://rivalregions.com/')
+            web.add_cookie(self.get_cookie(self.username))
+            web.go_to('https://rivalregions.com/#slide/conference/{}'.format(conference_id))
+            web.refresh()
+            time.sleep(2)
+
+            character_count = 0
+            tmp_message = ''
+            for sentence in message.split('\n'):
+                character_count += len(sentence)
+                if character_count >= 900:
+                    web.type(tmp_message, id='message')
+                    web.click(id='chat_send')
+                    character_count = 0
+                    tmp_message = ''
+                tmp_message += '{}\n'.format(sentence)
+
+            if tmp_message:
+                web.type(tmp_message, id='message')
+                web.click(id='chat_send')
+
+            LOGGER.info('conference %s: finished sending message', conference_id)
             web.close_current_tab()
         else:
             raise NoLogginException()
