@@ -342,7 +342,7 @@ class Client:
 
     @session_handler
     def send_personal_message(self, user_id, message):
-        """send chat message"""
+        """send personal message"""
         LOGGER.info('user %s: start sending message', user_id)
         if self.session:
             response = self.session.get("https://rivalregions.com/#overview")
@@ -363,7 +363,7 @@ class Client:
 
     @session_handler
     def send_conference_message(self, conference_id, message):
-        """send chat message"""
+        """send conference message"""
         LOGGER.info('conference %s: start sending message', conference_id)
         if self.session:
             response = self.session.get("https://rivalregions.com/#overview")
@@ -379,7 +379,7 @@ class Client:
             character_count = 0
             tmp_messages = []
             for sentence in message.split('\n'):
-                sentence_character_count = character_count
+                sentence_character_count = 0
                 tmp_sentence = []
                 for word in sentence.split(' '):
                     sentence_character_count += len(word) + 1
@@ -403,7 +403,6 @@ class Client:
                     LOGGER.info(
                         'conference %s: next message length: %s', conference_id, len(message)
                     )
-                    LOGGER.info('conference %s: sending next part of message')
                     web.type(message, id='message')
                     web.click(id='chat_send')
                     character_count = 0
@@ -422,3 +421,26 @@ class Client:
             web.close_current_tab()
         else:
             raise NoLogginException()
+
+    @session_handler
+    def send_conference_notification(self, conference_id, message, sound):
+        """send conference notification"""
+        LOGGER.info('conference %s: start sending notification', conference_id)
+        data = {
+            'sound': 1 if sound else 0,
+            'text': message,
+            'c': self.var_c
+        }
+
+        if self.session:
+            LOGGER.info('conference %s: sending notification', conference_id)
+            response = self.session.post(
+                "https://rivalregions.com/rival/konffcm/{}/".format(conference_id),
+                data=data
+            )
+            if "Session expired, please, reload the page" in response.text or \
+                    'window.location="https://rivalregions.com";' in response.text:
+                raise SessionExpireException()
+        else:
+            raise NoLogginException()
+        return response.text
