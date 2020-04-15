@@ -56,14 +56,14 @@ class NoLogginException(Exception):
     """Raise exception when client isn't logged in"""
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
-        LOGGER.warning('Session has expired')
+        LOGGER.warning('Not logged in')
 
 
 class NoPHPsessidException(Exception):
-    """Raise exception when cookie isn't found"""
+    """Raise exception when there is no PHPsessid found"""
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
-        LOGGER.warning('No phpsessid found')
+        LOGGER.warning('No PHPsessid found')
 
 
 def session_handler(func):
@@ -304,6 +304,8 @@ class Client:
         """Send post request to Rival Regions"""
         if path[0] == '/':
             path = path[1:]
+        if not data:
+            data = {}
         data['c'] = self.var_c
 
         LOGGER.debug('POST: %s', path)
