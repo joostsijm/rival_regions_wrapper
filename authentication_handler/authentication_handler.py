@@ -85,7 +85,7 @@ def session_handler(func):
 
     return wrapper
 
-class Client:
+class AuthenticationHandler:
     """class for RR client"""
     cookie = None
     var_c = None
