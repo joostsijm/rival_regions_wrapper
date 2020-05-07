@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 import requests
 
-# from authentication_handler import AuthenticationHandler
+from .authentication_handler import AuthenticationHandler
 
 
 class MiddlewareBase(ABC):
@@ -23,16 +23,21 @@ class LocalAuthentication(MiddlewareBase):
     """Local authentication"""
 
     def __init__(self, username, password, login_method):
-        self.username = username
-        self.password = password
-        self.login_method = login_method
+        self.client = AuthenticationHandler()
+        self.client.set_credentials({
+            'username': username,
+            'password': password,
+            'login_method': login_method
+        })
         super().__init__()
 
     def get(self, path, add_c_var=False):
         """Send get requests"""
+        return self.client.get(path)
 
     def post(self, path, data=None):
         """Send post request"""
+        return self.client.post(path, data=data)
 
 
 class RemoteAuthentication(MiddlewareBase):
