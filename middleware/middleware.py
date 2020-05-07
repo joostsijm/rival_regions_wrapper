@@ -2,7 +2,9 @@
 
 from abc import ABC, abstractmethod
 
-from authentication_handler import AuthenticationHandeler
+import requests
+
+# from authentication_handler import AuthenticationHandler
 
 
 class MiddlewareBase(ABC):
@@ -38,11 +40,24 @@ class RemoteAuthentication(MiddlewareBase):
 
     def __init__(self, api_url, authentication_key):
         self.api_url = api_url
-        self.authentication_key = authentication_key
+        self.headers = {
+            'Authorization': authentication_key
+        }
         super().__init__()
 
     def get(self, path, add_c_var=False):
         """Send get requests"""
+        try:
+            response = requests.get(
+                '{}{}'.format(self.api_url, path), headers=self.headers
+            )
+            return response.text
+        except requests.exceptions.Timeout:
+            print('timeout')
+        except requests.exceptions.RequestException as exception:
+            print('request exception')
+            raise SystemExit(exception)
+        return None
 
     def post(self, path, data=None):
         """Send post request"""
