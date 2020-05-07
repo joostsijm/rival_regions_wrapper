@@ -3,15 +3,15 @@ This library will functions as an API wrapper for interaction with Rival Regions
 
 ## Middleware
 The API wrapper uses middleware to decide where how to send the request.
-Middlewares can also be used to write direct requests to Rival Regions. 
+Middlewares can also be used to write direct requests to Rival Regions.
 
-Current middleware 
+Current middleware
 
-## LocalAuthentication 
-Use username, password, and login method to log in localy.
+### LocalAuthentication
+Use username, password, and login method to log in local instance of the authenticator.
 
-## RemoteAuthentication
-Connect in through remote API using URL and authentication key.
+### RemoteAuthentication
+Connect through a remote API using URL and authentication key.
 
 ## Examples
 Create local authentication middleman and log in with environ variables.
