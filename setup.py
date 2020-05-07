@@ -1,7 +1,9 @@
+"""Setup file"""
+
 import setuptools
 
 with open("README.md", "r") as fh:
-    long_description = fh.read()
+    LONG_DESCRIPTION = fh.read()
 
 setuptools.setup(
     name="rival_regions_wrapper",
@@ -9,13 +11,13 @@ setuptools.setup(
     author="Joost Sijm",
     author_email="joostsijm@gmail.com",
     description="Rival Regions API wrapper",
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
-    url="https://github.com/jjoo914/rival_regions_calc",
+    url="git@github.com:jjoo914/rival_regions_wrapper.git",
     packages=setuptools.find_packages(),
     install_requires=[
-       'webbot',
-       'cfscrape'
+        'webbot',
+        'cfscrape'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
