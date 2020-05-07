@@ -11,6 +11,7 @@ webbot = "*"
 lxml = "*"
 requests = "*"
 cfscrape = "*"
+appdirs = "*"
 
 [requires]
 python_version = "3"

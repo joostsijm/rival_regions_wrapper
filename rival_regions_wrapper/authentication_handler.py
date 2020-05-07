@@ -9,10 +9,12 @@ import re
 import time
 from datetime import datetime
 import json
+import pathlib
 
 import requests
 import cfscrape
 from webbot.webbot import Browser
+from appdirs import user_data_dir
 
 
 # get logger
@@ -36,6 +38,9 @@ FILE_HANDLER.setFormatter(FILE_FORMATTER)
 # add the handlers to logger
 LOGGER.addHandler(STREAM_HANDLER)
 LOGGER.addHandler(FILE_HANDLER)
+
+DATA_DIR = user_data_dir('rival_regions_wrapper', 'bergc')
+pathlib.Path(DATA_DIR).mkdir(parents=True, exist_ok=True) 
 
 
 class RRClientException(Exception):
@@ -214,7 +219,7 @@ class AuthenticationHandler:
         LOGGER.info('Saving cookie for "%s"', username)
         cookies = None
         try:
-            with open('cookies.json', 'r') as cookies_file:
+            with open('{}/cookies.json'.format(DATA_DIR), 'r') as cookies_file:
                 cookies = json.load(cookies_file)
         except FileNotFoundError:
             cookies = {}
@@ -222,7 +227,7 @@ class AuthenticationHandler:
             'expires': cookie['expires'],
             'value': cookie['value'],
         }
-        with open('cookies.json', 'w+') as cookies_file:
+        with open('{}/cookies.json'.format(DATA_DIR), 'w+') as cookies_file:
             json.dump(cookies, cookies_file)
         LOGGER.info('Saved cookie for "%s"', username)
 
@@ -231,7 +236,7 @@ class AuthenticationHandler:
         """Read cookies for username"""
         LOGGER.info('Read cookie for "%s"', username)
         try:
-            with open('cookies.json', 'r') as cookies_file:
+            with open('{}/cookies.json'.format(DATA_DIR), 'r') as cookies_file:
                 cookies = json.load(cookies_file)
                 for cookie_username, cookie in cookies.items():
                     if cookie_username == username:
@@ -255,12 +260,12 @@ class AuthenticationHandler:
         LOGGER.info('Removing cookie for "%s"', username)
         cookies = None
         try:
-            with open('cookies.json', 'r') as cookies_file:
+            with open('{}/cookies.json'.format(DATA_DIR), 'r') as cookies_file:
                 cookies = json.load(cookies_file)
         except FileNotFoundError:
             cookies = {}
         cookies.pop(username, None)
-        with open('cookies.json', 'w+') as cookies_file:
+        with open('{}/cookies.json'.format(DATA_DIR), 'w+') as cookies_file:
             json.dump(cookies, cookies_file)
         LOGGER.info('Removed cookie for "%s"', username)
 
