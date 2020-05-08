@@ -17,7 +17,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         "appdirs",
-        "beautifulsoup4"
+        "beautifulsoup4",
         "cfscrape",
         "requests",
         "webbot",
