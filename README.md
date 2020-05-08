@@ -1,6 +1,13 @@
 # Rival-Regions-Wrapper
 This library will functions as an API wrapper for interaction with Rival Regions.
 
+## Install
+When using pipenv you can install this package with the following command:
+
+```
+pipenv install -e git+https://github.com/jjoo914/rival_regions_wrapper#egg=rival_regions_wrapper
+```
+
 ## Middleware
 The API wrapper uses middleware to decide where how to send the request.
 Middlewares can also be used to write direct requests to Rival Regions.
