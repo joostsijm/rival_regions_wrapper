@@ -16,11 +16,11 @@ setuptools.setup(
     url="git@github.com:jjoo914/rival_regions_wrapper.git",
     packages=setuptools.find_packages(),
     install_requires=[
-        'appdirs',
-        'beautifulsoup4'
-        'cfscrape',
-        'requests',
-        'webbot',
+        "appdirs",
+        "beautifulsoup4"
+        "cfscrape",
+        "requests",
+        "webbot",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
