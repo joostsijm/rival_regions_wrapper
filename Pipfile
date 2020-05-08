@@ -4,14 +4,16 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+python-dotenv = "*"
+pytest = "*"
+pytest-vcr = "*"
 
 [packages]
-requests-futures = "*"
-webbot = "*"
-lxml = "*"
-requests = "*"
-cfscrape = "*"
 appdirs = "*"
+beautifulsoup4 = "*"
+cfscrape = "*"
+requests = "*"
+webbot = "*"
 
 [requires]
 python_version = "3"

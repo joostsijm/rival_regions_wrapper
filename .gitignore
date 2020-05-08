@@ -1,3 +1,5 @@
-.venv
-cookies.json
+.venv/
+tests/cassettes/
 __pycache__/
+.env
+output.log
