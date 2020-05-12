@@ -27,3 +27,12 @@ def test_profile_info(profile_keys):
     assert isinstance(response['strenght'], int), "strenght should be a int"
     assert isinstance(response['education'], int), "education should be a int"
     assert isinstance(response['endurance'], int), "endurance should be a int"
+
+@pytest.fixture
+def storage_keys():
+    """Standard keys for storage"""
+    return [
+        'profile_id', 'oil', 'ore', 'uranium', 'diamonds', 'liquid_oxygen', 'rivalium',
+        'antirad', 'energy_drink', 'spacerockets', 'lss', 'tanks', 'aircrafts',
+        'missiles', 'bombers', 'battleships', 'laser_drones', 'moon_tanks', 'space_stations'
+    ]
