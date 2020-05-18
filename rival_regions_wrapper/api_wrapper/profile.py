@@ -19,7 +19,6 @@ class Profile(object):
         soup = BeautifulSoup(response, 'html.parser')
         level = soup.select_one('div.oil:nth-child(2) > div:nth-child(2)').text
         perks = soup.select('table tr:nth-child(2) span')
-        print(perks)
         profile = {
             'profile_id': self.profile_id,
             'name': re.sub(r'.*:\s', '', soup.find('h1').text),

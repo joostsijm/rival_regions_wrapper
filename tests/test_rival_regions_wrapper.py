@@ -2,7 +2,7 @@
 
 import pytest
 
-from rival_regions_wrapper.api_wrapper import Profile
+from rival_regions_wrapper.api_wrapper import Profile, Storage
 
 
 @pytest.fixture
@@ -13,10 +13,8 @@ def profile_keys():
 @pytest.mark.vcr()
 def test_profile_info(profile_keys):
     """Test an API call to get client info"""
-
     profile_instance = Profile(192852686)
     response = profile_instance.info()
-    print(response)
 
     assert isinstance(response, dict), "The response should be a dict"
     assert response['profile_id'] == 192852686, "The ID should be in the response"
@@ -32,7 +30,20 @@ def test_profile_info(profile_keys):
 def storage_keys():
     """Standard keys for storage"""
     return [
-        'profile_id', 'oil', 'ore', 'uranium', 'diamonds', 'liquid_oxygen', 'rivalium',
-        'antirad', 'energy_drink', 'spacerockets', 'lss', 'tanks', 'aircrafts',
-        'missiles', 'bombers', 'battleships', 'laser_drones', 'moon_tanks', 'space_stations'
+        'oil', 'ore', 'uranium', 'diamonds', 'liquid_oxygen',
+        'helium-3', 'rivalium', 'antirad', 'energy_drink', 
+        'spacerockets', 'lss', 'tanks', 'aircrafts', 'missiles', 
+        'bombers', 'battleships', 'laser_drones', 'moon_tanks', 'space_stations',
+        'oil_max', 'ore_max', 'uranium_max', 'diamonds_max', 'liquid_oxygen_max',
+        'helium-3_max', 'rivalium_max', 'antirad_max', 'energy_drink_max', 
+        'spacerockets_max', 'lss_max', 'tanks_max', 'aircrafts_max', 'missiles_max', 
+        'bombers_max', 'battleships_max', 'laser_drones_max', 'moon_tanks_max', 'space_stations'
     ]
+
+@pytest.mark.vcr()
+def test_storage_info(storage_keys):
+    """Test an API call to get storage info"""
+    response = Storage.info()
+
+    assert isinstance(response, dict), "The response should be a dict"
+    assert set(storage_keys).issubset(response.keys()), "All keys should be in the response"

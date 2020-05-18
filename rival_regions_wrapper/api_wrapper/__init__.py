@@ -30,3 +30,4 @@ if None in (USERNAME, PASSWORD, LOGIN_METHOD):
 MIDDLEWARE = LocalAuthentication(USERNAME,PASSWORD,LOGIN_METHOD)
 
 from .profile import Profile
+from .storage import Storage
