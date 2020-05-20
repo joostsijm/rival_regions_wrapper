@@ -26,8 +26,9 @@ if None in (USERNAME, PASSWORD, LOGIN_METHOD):
     )
 
 # api
-# MIDDLEWARE = RemoteAuthentication(API_URL, AUTHORIZATION)
-MIDDLEWARE = LocalAuthentication(USERNAME,PASSWORD,LOGIN_METHOD)
+MIDDLEWARE = RemoteAuthentication(API_URL, AUTHORIZATION)
+# MIDDLEWARE = LocalAuthentication(USERNAME,PASSWORD,LOGIN_METHOD)
 
 from .profile import Profile
 from .storage import Storage
+from .market import Market

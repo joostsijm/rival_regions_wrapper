@@ -2,7 +2,7 @@
 
 import pytest
 
-from rival_regions_wrapper.api_wrapper import Profile, Storage
+from rival_regions_wrapper.api_wrapper import Profile, Storage, Market
 
 
 @pytest.fixture
@@ -47,3 +47,23 @@ def test_storage_info(storage_keys):
 
     assert isinstance(response, dict), "The response should be a dict"
     assert set(storage_keys).issubset(response.keys()), "All keys should be in the response"
+
+@pytest.fixture
+def market_keys():
+    """Standard keys for storage"""
+    return ['player_id', 'player_name', 'price', 'amount']
+
+@pytest.mark.vcr()
+def test_market_info(market_keys):
+    """Test an API call to get market info"""
+    resource = 'oil'
+    response = Market.info(resource)
+
+    assert isinstance(response, list), "The response should be a list"
+    if response:
+        assert isinstance(response[0], dict), "The first element should be a dict"
+        assert set(market_keys).issubset(response[0].keys()), "All keys should be in the response"
+        assert isinstance(response[0]['player_id'], int), "The player_id should be a int"
+        assert isinstance(response[0]['player_name'], str), "The player_name should be a int"
+        assert isinstance(response[0]['price'], int), "The price should be a int"
+        assert isinstance(response[0]['amount'], int), "The price should be a int"
