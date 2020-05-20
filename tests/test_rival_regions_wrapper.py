@@ -2,7 +2,7 @@
 
 import pytest
 
-from rival_regions_wrapper.api_wrapper import Profile, Storage, Market
+from rival_regions_wrapper.api_wrapper import Profile, Storage, Market, ResourceState
 
 
 @pytest.fixture
@@ -67,3 +67,26 @@ def test_market_info(market_keys):
         assert isinstance(response[0]['player_name'], str), "The player_name should be a int"
         assert isinstance(response[0]['price'], int), "The price should be a int"
         assert isinstance(response[0]['amount'], int), "The price should be a int"
+
+@pytest.fixture
+def resource_keys():
+    """Standard keys for resource"""
+    return ['region_id', 'region_name', 'explored', 'maximum', 'deep_exploration', 'limit_left']
+
+@pytest.mark.vcr()
+def test_resource_state_info(resource_keys):
+    """Test an API call to get market info"""
+    state = 3382
+    resource = 'oil'
+    response = ResourceState.info(state, resource)
+
+    assert isinstance(response, list), "The response should be a list"
+    if response:
+        assert isinstance(response[0], dict), "The first element should be a dict"
+        assert set(resource_keys).issubset(response[0].keys()), "All keys should be in the response"
+        assert isinstance(response[0]['region_id'], int), "The region_id should be a int"
+        assert isinstance(response[0]['region_name'], str), "The region_name should be a str"
+        assert isinstance(response[0]['explored'], float), "The explored should be a float"
+        assert isinstance(response[0]['maximum'], int), "The maximum should be a int"
+        assert isinstance(response[0]['deep_exploration'], int), "deep_exploration should be int"
+        assert isinstance(response[0]['limit_left'], int), "The limit_left should be a int"
