@@ -1,8 +1,10 @@
 """Wrapper test"""
 
+from datetime import datetime
+
 import pytest
 
-from rival_regions_wrapper.api_wrapper import Profile, Storage, Market, ResourceState
+from rival_regions_wrapper.api_wrapper import Profile, Storage, Market, ResourceState, Perks
 
 
 @pytest.fixture
@@ -90,3 +92,21 @@ def test_resource_state_info(resource_keys):
         assert isinstance(response[0]['maximum'], int), "The maximum should be a int"
         assert isinstance(response[0]['deep_exploration'], int), "deep_exploration should be int"
         assert isinstance(response[0]['limit_left'], int), "The limit_left should be a int"
+
+@pytest.fixture
+def perks_keys():
+    """Standard keys for perks"""
+    return ['strenght', 'education', 'endurance', 'upgrade_date', 'upgrade_perk']
+
+@pytest.mark.vcr()
+def test_perks_info(perks_keys):
+    """Test an API call to get perks info"""
+    response = Perks.info()
+
+    assert isinstance(response, dict), "The response should be a dict"
+    assert set(perks_keys).issubset(response.keys()), "All keys should be in the response"
+    assert isinstance(response['strenght'], int), "strengt should be an int"
+    assert isinstance(response['education'], int), "educatino should be an int"
+    assert isinstance(response['endurance'], int), "endurance should be an int"
+    assert isinstance(response['upgrade_date'], datetime), "upgrade_date should be a date"
+    assert isinstance(response['upgrade_perk'], int), "upgrade_perk should be an int"

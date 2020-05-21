@@ -33,3 +33,4 @@ from .profile import Profile
 from .storage import Storage
 from .market import Market
 from .resource_state import ResourceState
+from .perks import Perks

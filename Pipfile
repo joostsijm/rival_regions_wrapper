@@ -14,6 +14,7 @@ beautifulsoup4 = "*"
 cfscrape = "*"
 requests = "*"
 webbot = "*"
+python-dateutil = "*"
 
 [requires]
 python_version = "3"
