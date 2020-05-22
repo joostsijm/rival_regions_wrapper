@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pytest
 
-from rival_regions_wrapper.api_wrapper import Profile, Storage, Market, ResourceState, Perks
+from rival_regions_wrapper.api_wrapper import Profile, Storage, Market, ResourceState, Perks, Craft
 
 
 @pytest.fixture
@@ -110,3 +110,22 @@ def test_perks_info(perks_keys):
     assert isinstance(response['endurance'], int), "endurance should be an int"
     assert isinstance(response['upgrade_date'], datetime), "upgrade_date should be a date"
     assert isinstance(response['upgrade_perk'], int), "upgrade_perk should be an int"
+
+@pytest.fixture
+def craft_keys():
+    """Standard keys for craft"""
+    return ['market_price', 'resources']
+
+@pytest.mark.vcr()
+def test_craft_info(craft_keys):
+    """Test an API call to get craft info"""
+    item = 'bombers'
+    response = Craft.info(item)
+
+    assert isinstance(response, dict), "The response should be a dict"
+    assert isinstance(response['market_price'], int), "The market_price should be an int"
+    assert isinstance(response['resources'], dict), "The resources should be a dict"
+    assert isinstance(response['resources']['cash'], int), "The cash should be an int"
+    assert isinstance(response['resources']['oil'], int), "The oil should be an int"
+    assert isinstance(response['resources']['ore'], int), "The ore should be an int"
+    assert isinstance(response['resources']['diamond'], int), "The diamond should be an int"
