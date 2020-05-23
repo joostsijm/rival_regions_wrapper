@@ -4,7 +4,8 @@ from datetime import datetime
 
 import pytest
 
-from rival_regions_wrapper.api_wrapper import Profile, Storage, Market, ResourceState, Perks, Craft
+from rival_regions_wrapper.api_wrapper import Profile, Storage, Market, ResourceState, Perks, \
+    Craft, Overview, War
 
 
 @pytest.fixture
@@ -117,15 +118,44 @@ def craft_keys():
     return ['market_price', 'resources']
 
 @pytest.mark.vcr()
-def test_craft_info(craft_keys):
-    """Test an API call to get craft info"""
-    item = 'bombers'
-    response = Craft.info(item)
+def test_craft_produce():
+    """Test an API call to produce new item"""
+    item = 'energy_drink'
+    Craft.produce(item, 10)
+
+    assert True
+
+@pytest.fixture
+def overview_info_keys():
+    """Standard keys for overview info"""
+    return ['perks', 'war']
+
+@pytest.mark.vcr()
+def test_overview_info(overview_info_keys):
+    """Test an API call for overview"""
+    response = Overview.info()
+
+    assert isinstance(response, dict), "The response hould be a dict"
+    assert set(overview_info_keys).issubset(response.keys()), "All keys should be in the response"
+    assert isinstance(response['war'], dict), "The war key should be a dict"
+
+@pytest.fixture
+def overview_status_keys():
+    """Standard kenys for overview status"""
+    return ['profile_id', 'party_id', 'gold', 'money', 'level', 'exp']
+
+@pytest.mark.vcr()
+def test_overview_status(overview_status_keys):
+    """Test an API cal for status"""
+    response = Overview.status()
+
+    assert isinstance(response, dict), "The response hould be a dict"
+    assert set(overview_status_keys).issubset(response.keys()), "All keys should be in the response"
+
+@pytest.mark.vcr()
+def test_war_page():
+    """Test getting training war"""
+    response = War.page()
 
     assert isinstance(response, dict), "The response should be a dict"
-    assert isinstance(response['market_price'], int), "The market_price should be an int"
-    assert isinstance(response['resources'], dict), "The resources should be a dict"
-    assert isinstance(response['resources']['cash'], int), "The cash should be an int"
-    assert isinstance(response['resources']['oil'], int), "The oil should be an int"
-    assert isinstance(response['resources']['ore'], int), "The ore should be an int"
-    assert isinstance(response['resources']['diamond'], int), "The diamond should be an int"
+    assert isinstance(response['training_war'], int), "The training_war should be an int"

@@ -66,3 +66,14 @@ class RemoteAuthentication(MiddlewareBase):
 
     def post(self, path, data=None):
         """Send post request"""
+        try:
+            response = requests.post(
+                '{}{}'.format(self.api_url, path), headers=self.headers
+            )
+            return response.text
+        except requests.exceptions.Timeout:
+            print('timeout')
+        except requests.exceptions.RequestException as exception:
+            print('request exception')
+            raise SystemExit(exception)
+        return None
