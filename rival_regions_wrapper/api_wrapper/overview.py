@@ -17,16 +17,18 @@ class Overview(object):
         path = 'main/content'
         response = MIDDLEWARE.get(path)
         soup = BeautifulSoup(response, 'html.parser')
-        date_string = re.sub(r'^.*:\s', '', soup.select_one('.perk_source_4 .small').text)
-        current_perk = soup.select_one('.perk_source_4:has(.small)')
-        if current_perk.has_attr('perk'):
-            upgrade_perk = int(current_perk['perk'])
-        else:
-            upgrade_perk = None
-
+        perks = soup.select('.perk_source_4')
+        upgrade_perk = None
+        date_string = None
+        for perk in perks:
+            date_string = perk.select_one('.small')
+            if date_string:
+                upgrade_perk = int(perk['perk'])
+                date_string = re.sub(r'^.*:\s', '', soup.select_one('.perk_source_4 .small').text)
+                break
         auto_war = soup.select_one('.war_index_war span.pointer:nth-child(4)')
-        if auto_war.has_attr('action'):
-            auto_war = soup.select_one('.war_index_war span.pointer:nth-child(4)')['action']
+        if auto_war and auto_war.has_attr('action'):
+            auto_war = auto_war['action'].replace('war/details/', '')
         else:
             auto_war = None
         overview = {
@@ -38,7 +40,7 @@ class Overview(object):
                 'upgrade_perk': upgrade_perk
             },
             'war': {
-                'auto_war': auto_war.replace('war/details/', ''),
+                'auto_war': auto_war,
             }
         }
         return overview
