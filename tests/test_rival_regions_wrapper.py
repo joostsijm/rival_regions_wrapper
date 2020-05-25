@@ -159,3 +159,13 @@ def test_war_page():
 
     assert isinstance(response, dict), "The response should be a dict"
     assert isinstance(response['training_war'], int), "The training_war should be an int"
+
+@pytest.mark.vcr()
+def test_war_info():
+    """Test war info"""
+    war_page = War.page()
+    print(war_page['training_war'])
+    war_id = war_page['training_war']
+    response = War.info(war_id)
+
+    print(response)
