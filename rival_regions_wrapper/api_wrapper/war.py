@@ -1,7 +1,7 @@
 """Profile class"""
 
 import re
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from bs4 import BeautifulSoup
 
@@ -35,21 +35,40 @@ class War(object):
         path = 'war/details/{}'.format(war_id)
         response = MIDDLEWARE.get(path)
         soup = BeautifulSoup(response, 'html.parser')
-        # heading = soup.find('h1')
-        pattern = re.compile('.war_det_cou')
-        pattern = re.compile('.war_det_cou')
-        script = soup.find('script', text=pattern)
+        war_info = {
+            'damage': int(soup.select_one('.war_w_target_o').text.replace('.', '')),
+            'attack_damage': int(soup.select_one('.war_w_target_a').text.replace('.', '')),
+            'defence_damage': int(soup.select_one('.war_w_target_d').text.replace('.', '')),
+            'attack_hourly_available': bool(soup.select_one('.hide_once_war')),
+        }
+        heading = soup.find('h1')
+        energ_drinks = re.search(r'\d+$', heading.select_one('.small').text)
+        if energ_drinks:
+            war_info['energ_drinks'] = int(energ_drinks.group(0))
+
+        header_texts = heading.select('.float_left')
+        try:
+            war_info['name'] = header_texts[1].text
+        except IndexError:
+            pass
+
+        max_hero = heading.select_one('.max_hero')
+        war_info['max_hero_name'] = max_hero.text
+        war_info['max_hero_id'] = max_hero['action'].replace('slide/profile/', '')
+
+        max_hero_damage_str = ''.join(heading.find_all(text=True, recursive=False)).strip()
+        max_hero_damage = re.search(r'(\d|\.)+', max_hero_damage_str)
+        if max_hero_damage:
+            war_info['max_hero_damage'] = int(max_hero_damage.group(0).replace('.', ''))
+
+        script = soup.find('script', text=re.compile('.war_det_cou'))
         search_result = re.search(r'\'\d+\'', str(script))
         if search_result:
             seconds = int(search_result.group(0).replace('\'', ''))
-            time_left = timedelta(seconds=seconds)
-            time_left = time_left - timedelta(time_left.days)
-        war_info = {
-            'attack': {
-                'damage': int(soup.select_one('.war_w_target_a').text.replace('.', ''))
-            },
-            'defence': {
-                'damage': int(soup.select_one('.war_w_target_d').text.replace('.', ''))
-            }
-        }
+            war_info['time_left'] = timedelta(seconds=seconds)
+            war_info['finish_date'] = datetime.now() + war_info['time_left']
+
+        war_info['war_units'] = {}
+        for war_unit in soup.select('.war_w_unit_div'):
+            war_info['war_units'][war_unit['url']] = war_unit.text
         return war_info
