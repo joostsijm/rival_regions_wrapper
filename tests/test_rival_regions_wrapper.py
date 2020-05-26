@@ -167,13 +167,12 @@ def test_war_info():
     war_id = war_page['training_war']
     response = War.info(war_id)
 
-    print(response)
     assert isinstance(response, dict), "The response should be a dict"
     assert isinstance(response['damage'], int), "Damage should be an int"
     assert isinstance(response['attack_damage'], int), "Attack damage should be an int"
     assert isinstance(response['defence_damage'], int), "Defence damage should be an int"
-    assert isinstance(response['attack_hourly'], bool), "Attack hourly should be a bool"
-    assert isinstance(response['energy_drink'], int), "Energy drinks should be an int"
+    assert isinstance(response['attack_hourly_available'], bool), "Attack hourly should be a bool"
+    assert isinstance(response['energ_drinks'], int), "Energy drinks should be an int"
     assert isinstance(response['name'], str), "Name should be a str"
     assert isinstance(response['max_hero_name'], str), "max hero name should be a str"
     assert isinstance(response['max_hero_damage'], int), "max hero damage should be an int"
