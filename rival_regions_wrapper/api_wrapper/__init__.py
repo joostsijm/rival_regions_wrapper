@@ -37,3 +37,4 @@ from .perks import Perks
 from .craft import Craft
 from .overview import Overview
 from .war import War
+from .work import Work

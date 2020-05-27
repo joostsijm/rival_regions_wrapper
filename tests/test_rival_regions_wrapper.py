@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import pytest
 
 from rival_regions_wrapper.api_wrapper import Profile, Storage, Market, ResourceState, Perks, \
-    Craft, Overview, War
+    Craft, Overview, War, Work
 
 
 @pytest.fixture
@@ -180,3 +180,9 @@ def test_war_info():
         assert isinstance(response['time_left'], timedelta), "time left should be a time delta"
     assert isinstance(response['finish_date'], datetime), "Finish date should be a date"
     assert isinstance(response['war_units'], dict), "war units should be a dict"
+
+@pytest.mark.vcr()
+def test_work_info():
+    """Test work info"""
+    response = Work.page()
+    print(response)
