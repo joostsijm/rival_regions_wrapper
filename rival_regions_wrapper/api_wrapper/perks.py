@@ -42,3 +42,25 @@ class Perks(object):
             'upgrade_perk': upgrade_perk
         }
         return perks
+
+    @staticmethod
+    def upgrade(perk, upgrade_type):
+        """Craft item"""
+        perk_keys = {
+            'strength': 1,
+            'education': 2,
+            'endurance': 3,
+        }
+        if isinstance(perk, str) and perk in perk_keys:
+            perk_keys = perk_keys[perk]
+
+        upgrade_type_keys = {
+            'money': 1,
+            'gold': 2,
+        }
+        if isinstance(upgrade_type, str) and upgrade_type in upgrade_type_keys:
+            upgrade_type = upgrade_type_keys[upgrade_type]
+
+        MIDDLEWARE.post('perks/up/{}/{}'.format(perk, upgrade_type))
+        return True
+        
