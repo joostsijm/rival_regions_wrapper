@@ -185,4 +185,8 @@ def test_war_info():
 def test_work_info():
     """Test work info"""
     response = Work.page()
-    print(response)
+
+    assert isinstance(response, dict), "The response should be a dict"
+    assert isinstance(response['factory'], dict), "Factory should be a dict"
+    assert isinstance(response['resources_left'], dict), "Resources left should be a dict"
+    assert isinstance(response['work_exp'], dict), "Work exp should be a dict"
