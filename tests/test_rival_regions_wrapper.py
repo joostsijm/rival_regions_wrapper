@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import pytest
 
 from rival_regions_wrapper.api_wrapper import Profile, Storage, Market, ResourceState, Perks, \
-    Craft, Overview, War, Work
+    Craft, Overview, War, Work, Article
 
 
 @pytest.fixture
@@ -197,3 +197,22 @@ def test_work_info():
     assert isinstance(response['factory'], dict), "Factory should be a dict"
     assert isinstance(response['resources_left'], dict), "Resources left should be a dict"
     assert isinstance(response['work_exp'], dict), "Work exp should be a dict"
+
+@pytest.mark.vcr()
+def test_article_info():
+    """Test article info"""
+    article_id = 2708696
+    response = Article.info(article_id)
+
+    assert isinstance(response, dict), "The resonse should be a dict"
+    assert isinstance(response['article_id'], int), "Article id should be an integer"
+    assert isinstance(response['article_title'], str), "Article title should be a str"
+    assert isinstance(response['newspaper_id'], int), "Newspaper id should be an integer"
+    assert isinstance(response['newspaper_name'], str), "Newspaper name should be a string"
+    assert isinstance(response['author_name'], str), "Author name should be a string"
+    assert isinstance(response['author_id'], int), "Author id should be an integer"
+    assert isinstance(response['region_name'], str), "Region name should be a string"
+    assert isinstance(response['region_id'], int), "Region id should be an integer"
+    assert isinstance(response['content_text'], str), "Content text should be a string"
+    assert isinstance(response['content_html'], str), "Content html should be a string"
+    assert isinstance(response['language'], str), "Language should be a string"
