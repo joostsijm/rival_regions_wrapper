@@ -1,4 +1,4 @@
-"""Profile class"""
+"""Perks class"""
 
 import re
 from datetime import timedelta
@@ -6,17 +6,16 @@ from datetime import timedelta
 from bs4 import BeautifulSoup
 from dateutil import parser
 
-from . import MIDDLEWARE
 
-
-class Perks(object):
+class Perks():
     """Wrapper class for perks"""
+    def __init__(self, api_wrapper):
+        self.api_wrapper = api_wrapper
 
-    @staticmethod
-    def info():
+    def info(self):
         """Get perks"""
         path = 'main/content'
-        response = MIDDLEWARE.get(path)
+        response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         perks = soup.select('.perk_source_4')
         upgrade_perk = None
@@ -43,8 +42,7 @@ class Perks(object):
         }
         return perks
 
-    @staticmethod
-    def upgrade(perk, upgrade_type):
+    def upgrade(self, perk, upgrade_type):
         """Craft item"""
         perk_keys = {
             'strength': 1,
@@ -61,6 +59,6 @@ class Perks(object):
         if isinstance(upgrade_type, str) and upgrade_type in upgrade_type_keys:
             upgrade_type = upgrade_type_keys[upgrade_type]
 
-        MIDDLEWARE.post('perks/up/{}/{}'.format(perk, upgrade_type))
+        self.api_wrapper.post('perks/up/{}/{}'.format(perk, upgrade_type))
         return True
         

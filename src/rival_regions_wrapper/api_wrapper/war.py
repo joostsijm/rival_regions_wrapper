@@ -1,21 +1,20 @@
-"""Profile class"""
+"""War class"""
 
 import re
 from datetime import datetime, timedelta
 
 from bs4 import BeautifulSoup
 
-from . import MIDDLEWARE
 
+class War():
+    """Wrapper class for war"""
+    def __init__(self, api_wrapper):
+        self.api_wrapper = api_wrapper
 
-class War(object):
-    """Wrapper class for profile"""
-
-    @staticmethod
-    def page():
+    def page(self):
         """Get training war"""
         path = 'war'
-        response = MIDDLEWARE.get(path)
+        response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         pattern = re.compile(r'war\/details\/\d+')
         script = soup.find('script', text=pattern)
@@ -29,11 +28,10 @@ class War(object):
         }
         return page
 
-    @staticmethod
-    def info(war_id):
+    def info(self, war_id):
         """Get war info"""
         path = 'war/details/{}'.format(war_id)
-        response = MIDDLEWARE.get(path)
+        response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         war_info = {
             'damage': int(soup.select_one('.war_w_target_o').text.replace('.', '')),

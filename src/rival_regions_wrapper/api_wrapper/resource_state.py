@@ -1,18 +1,18 @@
-"""Profile class"""
+"""Resource state class"""
 
 import re
 
 from bs4 import BeautifulSoup
 
-from . import MIDDLEWARE
 
+class ResourceState():
+    """Wrapper class for resource state"""
+    def __init__(self, api_wrapper, state_id):
+        self.api_wrapper = api_wrapper
+        self.state_id = state_id
 
-class ResourceState(object):
-    """Wrapper class for profile"""
-
-    @staticmethod
-    def info(state_id, resource):
-        """Get profile"""
+    def info(self, resource):
+        """Get resource state"""
         keys = {
             3: 'oil',
             4: 'ore',
@@ -21,8 +21,8 @@ class ResourceState(object):
         }
         if isinstance(resource, int) and resource in keys:
             resource = keys[resource]
-        path = 'listed/stateresources/{}/{}'.format(state_id, resource)
-        response = MIDDLEWARE.get(path)
+        path = 'listed/stateresources/{}/{}'.format(self.state_id, resource)
+        response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         regions_tree = soup.find_all(class_='list_link')
         regions = []

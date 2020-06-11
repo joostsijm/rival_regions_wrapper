@@ -9,7 +9,7 @@ import re
 import time
 from datetime import datetime
 import json
-import pathlib
+import pathlib2
 
 import requests
 import cfscrape
@@ -40,7 +40,7 @@ LOGGER.addHandler(STREAM_HANDLER)
 LOGGER.addHandler(FILE_HANDLER)
 
 DATA_DIR = user_data_dir('rival_regions_wrapper', 'bergc')
-pathlib.Path(DATA_DIR).mkdir(parents=True, exist_ok=True) 
+pathlib2.Path(DATA_DIR).mkdir(parents=True, exist_ok=True) 
 
 
 class RRClientException(Exception):

@@ -1,20 +1,19 @@
-"""Profile class"""
+"""Storage class"""
 
 import re
 
 from bs4 import BeautifulSoup
 
-from . import MIDDLEWARE
 
+class Storage():
+    """Wrapper class for storage"""
+    def __init__(self, api_wrapper):
+        self.api_wrapper = api_wrapper
 
-class Storage(object):
-    """Wrapper class for profile"""
-
-    @staticmethod
-    def info():
-        """Get profile"""
+    def info(self):
+        """storage info"""
         path = 'storage'
-        response = MIDDLEWARE.get(path)
+        response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         keys = {
             'oil': 3,

@@ -1,10 +1,8 @@
-"""Profile class"""
+"""Work class"""
 
 import re
 
 from bs4 import BeautifulSoup
-
-from . import MIDDLEWARE
 
 
 RESOURCE_DICT = {
@@ -16,13 +14,14 @@ RESOURCE_DICT = {
 }
 
 class Work(object):
-    """Wrapper class for profile"""
+    """Wrapper class for work"""
+    def __init__(self, api_wrapper):
+        self.api_wrapper = api_wrapper
 
-    @staticmethod
-    def page():
+    def page(self):
         """Get work page"""
         path = 'work'
-        response = MIDDLEWARE.get(path)
+        response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
 
         factory = soup.select_one('.work_item:nth-child(9)')

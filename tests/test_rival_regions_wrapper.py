@@ -14,9 +14,9 @@ def profile_keys():
     return ['profile_id', 'name', 'level', 'level_percentage', 'strenght', 'education', 'endurance']
 
 @pytest.mark.vcr()
-def test_profile_info(profile_keys):
+def test_profile_info(api_wrapper, profile_keys):
     """Test an API call to get client info"""
-    profile_instance = Profile(192852686)
+    profile_instance = Profile(api_wrapper, 192852686)
     response = profile_instance.info()
 
     assert isinstance(response, dict), "The response should be a dict"
@@ -44,9 +44,9 @@ def storage_keys():
     ]
 
 @pytest.mark.vcr()
-def test_storage_info(storage_keys):
+def test_storage_info(api_wrapper, storage_keys):
     """Test an API call to get storage info"""
-    response = Storage.info()
+    response = Storage(api_wrapper).info()
 
     assert isinstance(response, dict), "The response should be a dict"
     assert set(storage_keys).issubset(response.keys()), "All keys should be in the response"
@@ -57,10 +57,10 @@ def market_keys():
     return ['player_id', 'player_name', 'price', 'amount']
 
 @pytest.mark.vcr()
-def test_market_info(market_keys):
+def test_market_info(api_wrapper, market_keys):
     """Test an API call to get market info"""
     resource = 'oil'
-    response = Market.info(resource)
+    response = Market(api_wrapper).info(resource)
 
     assert isinstance(response, list), "The response should be a list"
     if response:
@@ -77,11 +77,11 @@ def resource_keys():
     return ['region_id', 'region_name', 'explored', 'maximum', 'deep_exploration', 'limit_left']
 
 @pytest.mark.vcr()
-def test_resource_state_info(resource_keys):
+def test_resource_state_info(api_wrapper, resource_keys):
     """Test an API call to get market info"""
     state = 3382
     resource = 'oil'
-    response = ResourceState.info(state, resource)
+    response = ResourceState(api_wrapper, state).info(resource)
 
     assert isinstance(response, list), "The response should be a list"
     if response:
@@ -100,9 +100,9 @@ def perks_keys():
     return ['strenght', 'education', 'endurance', 'upgrade_date', 'upgrade_perk']
 
 @pytest.mark.vcr()
-def test_perks_info(perks_keys):
+def test_perks_info(api_wrapper, perks_keys):
     """Test an API call to get perks info"""
-    response = Perks.info()
+    response = Perks(api_wrapper).info()
 
     assert isinstance(response, dict), "The response should be a dict"
     assert set(perks_keys).issubset(response.keys()), "All keys should be in the response"
@@ -113,7 +113,7 @@ def test_perks_info(perks_keys):
     assert isinstance(response['upgrade_perk'], int), "upgrade_perk should be an int"
 
 @pytest.mark.skip(reason="Update request")
-def test_perks_upgrade():
+def test_perks_upgrade(api_wrapper):
     """Test an API call to upgrade perk"""
     perk = 'endurance'
     upgrade_type = 'money'
@@ -124,11 +124,11 @@ def craft_keys():
     """Standard keys for craft"""
     return ['market_price', 'resources']
 
-@pytest.mark.vcr()
-def test_craft_produce():
+@pytest.mark.skip(reason="Update request")
+def test_craft_produce(api_wrapper):
     """Test an API call to produce new item"""
     item = 'energy_drink'
-    Craft.produce(item, 10)
+    Craft(api_wrapper).produce(item, 10)
 
     assert True
 
@@ -138,9 +138,9 @@ def overview_info_keys():
     return ['perks', 'war']
 
 @pytest.mark.vcr()
-def test_overview_info(overview_info_keys):
+def test_overview_info(api_wrapper, overview_info_keys):
     """Test an API call for overview"""
-    response = Overview.info()
+    response = Overview(api_wrapper).info()
 
     assert isinstance(response, dict), "The response hould be a dict"
     assert set(overview_info_keys).issubset(response.keys()), "All keys should be in the response"
@@ -152,27 +152,28 @@ def overview_status_keys():
     return ['profile_id', 'party_id', 'gold', 'money', 'level', 'exp']
 
 @pytest.mark.vcr()
-def test_overview_status(overview_status_keys):
+def test_overview_status(api_wrapper, overview_status_keys):
     """Test an API cal for status"""
-    response = Overview.status()
+    response = Overview(api_wrapper).status()
 
     assert isinstance(response, dict), "The response hould be a dict"
     assert set(overview_status_keys).issubset(response.keys()), "All keys should be in the response"
 
 @pytest.mark.vcr()
-def test_war_page():
+def test_war_page(api_wrapper):
     """Test getting training war"""
-    response = War.page()
+    response = War(api_wrapper).page()
 
     assert isinstance(response, dict), "The response should be a dict"
     assert isinstance(response['training_war'], int), "The training_war should be an int"
 
 @pytest.mark.vcr()
-def test_war_info():
+def test_war_info(api_wrapper):
     """Test war info"""
-    war_page = War.page()
+    war = War(api_wrapper)
+    war_page = war.page()
     war_id = war_page['training_war']
-    response = War.info(war_id)
+    response = war.info(war_id)
 
     assert isinstance(response, dict), "The response should be a dict"
     assert isinstance(response['damage'], int), "Damage should be an int"
@@ -189,9 +190,9 @@ def test_war_info():
     assert isinstance(response['war_units'], dict), "war units should be a dict"
 
 @pytest.mark.vcr()
-def test_work_info():
+def test_work_info(api_wrapper):
     """Test work info"""
-    response = Work.page()
+    response = Work(api_wrapper).page()
 
     assert isinstance(response, dict), "The response should be a dict"
     assert isinstance(response['factory'], dict), "Factory should be a dict"
@@ -199,10 +200,10 @@ def test_work_info():
     assert isinstance(response['work_exp'], dict), "Work exp should be a dict"
 
 @pytest.mark.vcr()
-def test_article_info():
+def test_article_info(api_wrapper):
     """Test article info"""
     article_id = 2708696
-    response = Article.info(article_id)
+    response = Article(api_wrapper).info(article_id)
 
     assert isinstance(response, dict), "The resonse should be a dict"
     assert isinstance(response['article_id'], int), "Article id should be an integer"

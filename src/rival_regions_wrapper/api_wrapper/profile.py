@@ -4,18 +4,17 @@ import re
 
 from bs4 import BeautifulSoup
 
-from . import MIDDLEWARE
 
-
-class Profile(object):
+class Profile():
     """Wrapper class for profile"""
-    def __init__(self, profile_id):
+    def __init__(self, api_wrapper, profile_id):
+        self.api_wrapper = api_wrapper
         self.profile_id = profile_id
 
     def info(self):
         """Get profile"""
         path = 'slide/profile/{}'.format(self.profile_id)
-        response = MIDDLEWARE.get(path)
+        response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         level = soup.select_one('div.oil:nth-child(2) > div:nth-child(2)').text
         perks = soup.select('table tr:nth-child(2) span')

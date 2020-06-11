@@ -1,18 +1,17 @@
-"""Profile class"""
+"""CRAFT class"""
 
 import re
 
 from bs4 import BeautifulSoup
 
-from . import MIDDLEWARE
 
-
-class Craft(object):
+class Craft():
     """Wrapper class for crafting"""
+    def __init__(self, api_wrapper):
+        self.api_wrapper = api_wrapper
 
-    @staticmethod
-    def info(item):
-        """Get profile"""
+    def info(self, item):
+        """Get craft"""
         keys = {
             'oil': 3,
             'ore': 4,
@@ -37,7 +36,7 @@ class Craft(object):
         if isinstance(item, str) and item in keys:
             item = keys[item]
         path = 'storage/produce/{}'.format(item)
-        response = MIDDLEWARE.get(path)
+        response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         resources = soup.select_one('.storage_produce_exp')
         resource_dict = {
@@ -61,8 +60,7 @@ class Craft(object):
         }
         return craft
 
-    @staticmethod
-    def produce(item, amount):
+    def produce(self, item, amount):
         """Craft item"""
         keys = {
             'oil': 3,
@@ -87,6 +85,6 @@ class Craft(object):
         }
         if isinstance(item, str) and item in keys:
             item = keys[item]
-        MIDDLEWARE.post('storage/newproduce/{}/{}'.format(item, amount))
+        self.api_wrapper.post('storage/newproduce/{}/{}'.format(item, amount))
         return True
         

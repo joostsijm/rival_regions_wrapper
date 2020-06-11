@@ -6,17 +6,16 @@ from datetime import timedelta
 from bs4 import BeautifulSoup
 from dateutil import parser
 
-from . import MIDDLEWARE
 
-
-class Overview(object):
+class Overview():
     """Wrapper class for perks"""
+    def __init__(self, api_wrapper):
+        self.api_wrapper = api_wrapper
 
-    @staticmethod
-    def info():
+    def info(self):
         """Get perks"""
         path = 'main/content'
-        response = MIDDLEWARE.get(path)
+        response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         perks = soup.select('.perk_source_4')
         upgrade_perk = None
@@ -53,11 +52,10 @@ class Overview(object):
         }
         return overview
 
-    @staticmethod
-    def status():
+    def status(self):
         """Get current status"""
         path = 'main'
-        response = MIDDLEWARE.get(path)
+        response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         profile_url = soup.select_one('#header_my_avatar')['action']
         party_url = soup.select_one('#party_menu_members')['action']

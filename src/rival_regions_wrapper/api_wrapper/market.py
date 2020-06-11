@@ -4,14 +4,13 @@ import re
 
 from bs4 import BeautifulSoup
 
-from . import MIDDLEWARE
 
-
-class Market(object):
+class Market():
     """Wrapper class for profile"""
+    def __init__(self, api_wrapper):
+        self.api_wrapper = api_wrapper
 
-    @staticmethod
-    def info(resource):
+    def info(self, resource):
         """Get profile"""
         keys = {
             'oil': 3,
@@ -37,7 +36,7 @@ class Market(object):
         if isinstance(resource, str) and resource in keys:
             resource = keys[resource]
         path = 'storage/listed/{}'.format(resource)
-        response = MIDDLEWARE.get(path)
+        response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
 
         offers_tree = soup.find_all(class_='list_link')
