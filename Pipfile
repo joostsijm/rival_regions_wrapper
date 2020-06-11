@@ -7,6 +7,8 @@ verify_ssl = true
 python-dotenv = "*"
 pytest = "*"
 pytest-vcr = "*"
+tox = "*"
+tox-venv = "*"
 
 [packages]
 appdirs = "*"
@@ -15,6 +17,7 @@ cfscrape = "*"
 requests = "*"
 webbot = "*"
 python-dateutil = "*"
+pathlib2 = "*"
 
 [requires]
 python_version = "3"

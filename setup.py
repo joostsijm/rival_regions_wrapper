@@ -14,7 +14,8 @@ setuptools.setup(
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     url="git@github.com:jjoo914/rival_regions_wrapper.git",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages('src'),
+    package_dir={'': 'src'},
     install_requires=[
         "appdirs",
         "beautifulsoup4",
@@ -22,6 +23,7 @@ setuptools.setup(
         "requests",
         "webbot",
         "python-dateutil",
+        "pathlib2",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
