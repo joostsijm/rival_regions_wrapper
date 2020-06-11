@@ -21,6 +21,7 @@ setuptools.setup(
         "cfscrape",
         "requests",
         "webbot",
+        "python-dateutil",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
