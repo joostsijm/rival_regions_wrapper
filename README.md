@@ -2,11 +2,23 @@
 This library will functions as an API wrapper for interaction with Rival Regions.
 
 ## Install
-When using pipenv you can install this package with the following command:
+The following steps can be used to install the package with pip:
 
+- clone the repository: `git clone git@github.com:jjoo914/rival_regions_wrapper.git`
+- use pip to install the package: `pip install rival_regions_wrapper`
+
+The package should be available globaly.
+
+### Pipenv
+When you want to add the package to a Pipfile, use the folowing command:
 ```
 pipenv install -e git+https://github.com/jjoo914/rival_regions_wrapper#egg=rival_regions_wrapper
 ```
+
+## Testing
+After installing you should be able to test the python package with pytest.
+These are located in `rival_regions_wrapper/tests/`.
+Requests are cached for quick testing using VCR.py located at `rival_regions_wrapper/tests/cassettes/`.
 
 ## Middleware
 The API wrapper uses middleware to decide where how to send the request.
