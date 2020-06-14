@@ -18,17 +18,20 @@ class Article(object):
         soup = BeautifulSoup(response, 'html.parser')
 
         links = soup.select('.newspaper_links')
-        newspaper = links[0]
-        author = links[1]
-        region = links[2]
+        if len(links) >= 3:
+            newspaper = links[0]
+            author = links[1]
+            region = links[2]
+        else:
+            author = links[0]
+            region = links[1]
+            newspaper = None
 
         news_content = soup.select_one('.news_content')
 
         article_info = {
             'article_id': article_id,
             'article_title': unicodedata.normalize("NFKD", soup.select_one('.title_totr').text),
-            'newspaper_id': int(newspaper['action'].replace('newspaper/show/', '')),
-            'newspaper_name': newspaper.text,
             'author_name': re.sub(r',\s\skarma.*$', '', author.text),
             'author_id': int(author['action'].replace('slide/profile/', '')),
             'region_name': region.text,
@@ -36,6 +39,13 @@ class Article(object):
             'content_text': news_content.text,
             'content_html': news_content.prettify(),
         }
+
+        if newspaper:
+            article_info['newspaper_id'] = int(newspaper['action'].replace('newspaper/show/', ''))
+            article_info['newspaper_name'] = newspaper.text
+        else:
+            article_info['newspaper_id'] = None
+            article_info['newspaper_name'] = None
 
         result = re.search(r'.+(\s.+,)', soup.select_one('.tc.small').text)
         try:
