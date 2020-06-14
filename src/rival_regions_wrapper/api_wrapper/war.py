@@ -2,6 +2,7 @@
 
 import re
 from datetime import datetime, timedelta
+import unicodedata
 
 from bs4 import BeautifulSoup
 
@@ -35,8 +36,6 @@ class War():
         soup = BeautifulSoup(response, 'html.parser')
         war_info = {
             'damage': int(soup.select_one('.war_w_target_o').text.replace('.', '')),
-            'attack_damage': int(soup.select_one('.war_w_target_a').text.replace('.', '')),
-            'defence_damage': int(soup.select_one('.war_w_target_d').text.replace('.', '')),
             'attack_hourly_available': bool(soup.select_one('.hide_once_war')),
         }
         heading = soup.find('h1')
@@ -69,4 +68,33 @@ class War():
         war_info['war_units'] = {}
         for war_unit in soup.select('.war_w_unit_div'):
             war_info['war_units'][war_unit['url']] = war_unit.text
+
+        attack_side = soup.select('#war_w_ata_s .hov2')
+        if len(attack_side) >= 3:
+            war_info['attack'] = {
+                'state_id': int(attack_side[0]['action'].replace('map/state_details/', '')),
+                'state_name': unicodedata.normalize("NFKD", attack_side[0].text),
+                'region_id': int(attack_side[1]['action'].replace('map/details/', '')),
+                'region_name': unicodedata.normalize("NFKD", attack_side[1].text),
+                'damage': int(soup.select_one('.war_w_target_a').text.replace('.', '')),
+            }
+        else:
+            war_info['attack'] = {
+                'damage': int(soup.select_one('.war_w_target_a').text.replace('.', '')),
+            }
+
+        defend_side = soup.select('#war_w_def_s .hov2')
+        if len(defend_side) >= 3:
+            war_info['defend'] = {
+                'state_id': int(defend_side[0]['action'].replace('map/state_details/', '')),
+                'state_name': unicodedata.normalize("NFKD", defend_side[0].text),
+                'region_id': int(defend_side[1]['action'].replace('map/details/', '')),
+                'region_name': unicodedata.normalize("NFKD", defend_side[1].text),
+                'damage': int(soup.select_one('.war_w_target_d').text.replace('.', '')),
+            }
+        else:
+            war_info['defend'] = {
+                'damage': int(soup.select_one('.war_w_target_d').text.replace('.', '')),
+            }
+
         return war_info

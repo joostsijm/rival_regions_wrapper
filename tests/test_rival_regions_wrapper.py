@@ -177,8 +177,8 @@ def test_war_info(api_wrapper):
 
     assert isinstance(response, dict), "The response should be a dict"
     assert isinstance(response['damage'], int), "Damage should be an int"
-    assert isinstance(response['attack_damage'], int), "Attack damage should be an int"
-    assert isinstance(response['defence_damage'], int), "Defence damage should be an int"
+    # assert isinstance(response['attack_damage'], int), "Attack damage should be an int"
+    # assert isinstance(response['defence_damage'], int), "Defence damage should be an int"
     assert isinstance(response['attack_hourly_available'], bool), "Attack hourly should be a bool"
     assert isinstance(response['energ_drinks'], int), "Energy drinks should be an int"
     assert isinstance(response['name'], str), "Name should be a str"
@@ -189,6 +189,26 @@ def test_war_info(api_wrapper):
     assert isinstance(response['finish_date'], datetime), "Finish date should be a date"
     assert isinstance(response['war_units'], dict), "war units should be a dict"
 
+@pytest.mark.vcr()
+def test_war_info_regions(api_wrapper):
+    """Test war info"""
+    war_id = 329461
+    response = War(api_wrapper).info(war_id)
+    print(response)
+
+    assert isinstance(response, dict), "The response should be a dict"
+    assert isinstance(response['damage'], int), "Damage should be an int"
+    # assert isinstance(response['attack_damage'], int), "Attack damage should be an int"
+    # assert isinstance(response['defence_damage'], int), "Defence damage should be an int"
+    assert isinstance(response['attack_hourly_available'], bool), "Attack hourly should be a bool"
+    assert isinstance(response['energ_drinks'], int), "Energy drinks should be an int"
+    assert isinstance(response['name'], str), "Name should be a str"
+    assert isinstance(response['max_hero_name'], str), "max hero name should be a str"
+    assert isinstance(response['max_hero_damage'], int), "max hero damage should be an int"
+    if 'time_left' in response:
+        assert isinstance(response['time_left'], timedelta), "time left should be a time delta"
+    assert isinstance(response['finish_date'], datetime), "Finish date should be a date"
+    assert isinstance(response['war_units'], dict), "war units should be a dict"
 @pytest.mark.vcr()
 def test_work_info(api_wrapper):
     """Test work info"""
