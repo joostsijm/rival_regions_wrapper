@@ -204,7 +204,7 @@ def article_keys():
     """Standard key fro article"""
     return ['article_id', 'article_title', 'newspaper_id', 'newspaper_name', \
         'author_name', 'author_id', 'region_name', 'region_id', 'content_text', 'content_html', \
-        'language']
+        'language', 'rating', 'comments', 'post_date']
 
 @pytest.mark.vcr()
 def test_article_info_one(api_wrapper, article_keys):
@@ -225,6 +225,9 @@ def test_article_info_one(api_wrapper, article_keys):
     assert isinstance(response['content_text'], str), "Content text should be a string"
     assert isinstance(response['content_html'], str), "Content html should be a string"
     assert isinstance(response['language'], str), "Language should be a string"
+    assert isinstance(response['rating'], int), "Rating should be an integer"
+    assert isinstance(response['comments'], int), "Comments should be an integer"
+    assert isinstance(response['post_date'], datetime), "Post date should be a datetime"
 
 @pytest.mark.vcr()
 def test_article_info_two(api_wrapper, article_keys):
@@ -245,3 +248,6 @@ def test_article_info_two(api_wrapper, article_keys):
     assert isinstance(response['content_text'], str), "Content text should be a string"
     assert isinstance(response['content_html'], str), "Content html should be a string"
     assert isinstance(response['language'], str), "Language should be a string"
+    assert isinstance(response['rating'], int), "Rating should be an integer"
+    assert isinstance(response['comments'], int), "Comments should be an integer"
+    assert isinstance(response['post_date'], datetime), "Post date should be a datetime"

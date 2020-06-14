@@ -1,9 +1,11 @@
 """Articl class"""
 
+from datetime import timedelta
 import unicodedata
 import re
 
 from bs4 import BeautifulSoup
+from dateutil import parser
 
 
 class Article(object):
@@ -38,6 +40,8 @@ class Article(object):
             'region_id': int(region['action'].replace('map/details/', '')),
             'content_text': news_content.text,
             'content_html': news_content.prettify(),
+            'rating': int(soup.select_one('#news_number').text),
+            'comments': int(soup.select_one('.news_comments_link').text)
         }
 
         if newspaper:
@@ -52,4 +56,15 @@ class Article(object):
             article_info['language'] = re.sub(r'\s|,', '', result[1].strip())
         except IndexError:
             pass
+
+        date_element = soup.select_one('.news_conent_title')
+        date_string = date_element.text.replace('✘', '').strip()
+        if 'Yesterday' in date_string:
+            time = re.search(r'\d\d:\d\d', date_string)
+            article_info['post_date'] = parser.parse(time.group(0)) - timedelta(days=1)
+        elif 'Today' in date_string:
+            time = re.search(r'\d\d:\d\d', date_string)
+            article_info['post_date'] = parser.parse(time.group(0))
+        else:
+            article_info['post_date'] = parser.parse(date_string)
         return article_info
