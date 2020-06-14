@@ -199,13 +199,21 @@ def test_work_info(api_wrapper):
     assert isinstance(response['resources_left'], dict), "Resources left should be a dict"
     assert isinstance(response['work_exp'], dict), "Work exp should be a dict"
 
+@pytest.fixture
+def article_keys():
+    """Standard key fro article"""
+    return ['article_id', 'article_title', 'newspaper_id', 'newspaper_name', \
+        'author_name', 'author_id', 'region_name', 'region_id', 'content_text', 'content_html', \
+        'language']
+
 @pytest.mark.vcr()
-def test_article_info_one(api_wrapper):
+def test_article_info_one(api_wrapper, article_keys):
     """Test article info"""
     article_id = 2708696
     response = Article(api_wrapper).info(article_id)
 
     assert isinstance(response, dict), "The resonse should be a dict"
+    assert set(article_keys).issubset(response.keys()), "All keys should be in the response"
     assert isinstance(response['article_id'], int), "Article id should be an integer"
     assert isinstance(response['article_title'], str), "Article title should be a str"
     assert isinstance(response['newspaper_id'], int), "Newspaper id should be an integer"
@@ -219,12 +227,13 @@ def test_article_info_one(api_wrapper):
     assert isinstance(response['language'], str), "Language should be a string"
 
 @pytest.mark.vcr()
-def test_article_info_two(api_wrapper):
+def test_article_info_two(api_wrapper, article_keys):
     """Test article info"""
     article_id = 2862982
     response = Article(api_wrapper).info(article_id)
 
     assert isinstance(response, dict), "The resonse should be a dict"
+    assert set(article_keys).issubset(response.keys()), "All keys should be in the response"
     assert isinstance(response['article_id'], int), "Article id should be an integer"
     assert isinstance(response['article_title'], str), "Article title should be a str"
     assert response['newspaper_id'] is None, "Newspaper id should be none"
