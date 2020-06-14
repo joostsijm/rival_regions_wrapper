@@ -177,11 +177,8 @@ def test_war_info(api_wrapper):
 
     assert isinstance(response, dict), "The response should be a dict"
     assert isinstance(response['damage'], int), "Damage should be an int"
-    # assert isinstance(response['attack_damage'], int), "Attack damage should be an int"
-    # assert isinstance(response['defence_damage'], int), "Defence damage should be an int"
     assert isinstance(response['attack_hourly_available'], bool), "Attack hourly should be a bool"
     assert isinstance(response['energ_drinks'], int), "Energy drinks should be an int"
-    assert isinstance(response['name'], str), "Name should be a str"
     assert isinstance(response['max_hero_name'], str), "max hero name should be a str"
     assert isinstance(response['max_hero_damage'], int), "max hero damage should be an int"
     if 'time_left' in response:
@@ -190,25 +187,71 @@ def test_war_info(api_wrapper):
     assert isinstance(response['war_units'], dict), "war units should be a dict"
 
 @pytest.mark.vcr()
-def test_war_info_regions(api_wrapper):
+def test_war_info_ground_war(api_wrapper):
+    """Test war info"""
+    war_id = 329541
+    response = War(api_wrapper).info(war_id)
+
+    assert isinstance(response, dict), "The response should be a dict"
+    assert response['type'] == 'war', "Type should be a ground war"
+    assert isinstance(response['attack'], dict), "Attack should be a dict"
+    assert isinstance(response['attack']['state_id'], int), "State id should be an integer"
+    assert isinstance(response['attack']['state_name'], str), "State nameshould be a string"
+    assert isinstance(response['attack']['region_id'], int), "Region id should be an integer"
+    assert isinstance(response['attack']['region_name'], str), "Region name should be a string"
+    assert isinstance(response['attack']['damage'], int), "Damage should be an intger"
+    assert isinstance(response['defend']['state_id'], int), "State id should be an integer"
+    assert isinstance(response['defend']['state_name'], str), "State name should be a string"
+    assert isinstance(response['defend']['region_id'], int), "Region id should be an integer"
+    assert isinstance(response['defend']['region_name'], str), "Region name should be a string"
+    assert isinstance(response['defend']['damage'], int), "Damage should be an integer"
+
+@pytest.mark.vcr()
+def test_war_info_coup(api_wrapper):
+    """Test war info"""
+    war_id = 329518
+    response = War(api_wrapper).info(war_id)
+
+    assert isinstance(response, dict), "The response should be a dict"
+    assert response['type'] == 'coup', "Type should be a coup"
+
+@pytest.mark.vcr()
+def test_war_info_revolution(api_wrapper):
     """Test war info"""
     war_id = 329461
     response = War(api_wrapper).info(war_id)
-    print(response)
 
     assert isinstance(response, dict), "The response should be a dict"
-    assert isinstance(response['damage'], int), "Damage should be an int"
-    # assert isinstance(response['attack_damage'], int), "Attack damage should be an int"
-    # assert isinstance(response['defence_damage'], int), "Defence damage should be an int"
-    assert isinstance(response['attack_hourly_available'], bool), "Attack hourly should be a bool"
-    assert isinstance(response['energ_drinks'], int), "Energy drinks should be an int"
-    assert isinstance(response['name'], str), "Name should be a str"
-    assert isinstance(response['max_hero_name'], str), "max hero name should be a str"
-    assert isinstance(response['max_hero_damage'], int), "max hero damage should be an int"
-    if 'time_left' in response:
-        assert isinstance(response['time_left'], timedelta), "time left should be a time delta"
-    assert isinstance(response['finish_date'], datetime), "Finish date should be a date"
-    assert isinstance(response['war_units'], dict), "war units should be a dict"
+    assert response['type'] == 'revolution', "Type should be a revolution"
+
+@pytest.mark.vcr()
+def test_war_info_trooper_war(api_wrapper):
+    """Test war info"""
+    war_id = 329458
+    response = War(api_wrapper).info(war_id)
+
+    assert isinstance(response, dict), "The response should be a dict"
+    assert response['type'] == 'troopers war', "Type should be a trooper war"
+
+@pytest.mark.vcr()
+def test_war_info_sea_war(api_wrapper):
+    """Test war info"""
+    war_id = 329618
+    response = War(api_wrapper).info(war_id)
+
+    assert isinstance(response, dict), "The response should be a dict"
+    assert response['type'] == 'sea war', "Type should be a sea war"
+
+@pytest.mark.vcr()
+def test_war_info_space_war(api_wrapper):
+    """Test war info"""
+    war_id = 329531
+    response = War(api_wrapper).info(war_id)
+
+    assert isinstance(response, dict), "The response should be a dict"
+    assert response['type'] == 'space war', "Type should be a space war"
+
+
 @pytest.mark.vcr()
 def test_work_info(api_wrapper):
     """Test work info"""

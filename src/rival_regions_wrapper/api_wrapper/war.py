@@ -43,11 +43,10 @@ class War():
         if energ_drinks:
             war_info['energ_drinks'] = int(energ_drinks.group(0))
 
-        header_texts = heading.select('.float_left')
-        try:
-            war_info['name'] = header_texts[1].text
-        except IndexError:
-            pass
+        war_info['type'] = re.sub(r',.*', '', heading.text).lower()
+        war_type = soup.select_one('.no_pointer')
+        if war_type and war_type.text == 'Revolution powers':
+            war_info['type'] = 'revolution'
 
         max_hero = heading.select_one('.max_hero')
         war_info['max_hero_name'] = max_hero.text
