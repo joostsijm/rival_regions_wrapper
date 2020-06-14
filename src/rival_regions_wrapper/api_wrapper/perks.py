@@ -30,6 +30,7 @@ class Perks():
                     upgrade_date = parser.parse(time.group(0)) + timedelta(days=1)
                 elif 'today' in date_string:
                     time = re.search(r'\d\d:\d\d', date_string)
+                    upgrade_date = parser.parse(time.group(0))
                 else:
                     upgrade_date = parser.parse(date_string)
                 break
