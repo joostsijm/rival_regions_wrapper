@@ -1,7 +1,7 @@
 """Perks class"""
 
 import re
-from datetime import timedelta
+from datetime import timedelta, timezone
 
 from bs4 import BeautifulSoup
 from dateutil import parser
@@ -34,6 +34,7 @@ class Perks():
                 else:
                     upgrade_date = parser.parse(date_string)
                 break
+        upgrade_date = upgrade_date.replace(tzinfo=timezone.utc) if upgrade_date else None
         perks = {
             'strenght': int(soup.find('div', {'perk': 1, 'class': 'perk_source_2'}).text),
             'education': int(soup.find('div', {'perk': 2, 'class': 'perk_source_2'}).text),

@@ -37,7 +37,9 @@ class Work():
         if level_str:
             factory_dict['level'] = int(re.sub(r'level\s', '', level_str.group(0)))
 
-        string_list = [string.strip() for string in factory.select_one('.button_white').strings]
+        string_list = []
+        for string in factory.select_one('.work_factory_button').strings:
+            string_list.append(string.strip())
         try:
             wage = string_list[2]
             if '%' in wage:

@@ -1,6 +1,6 @@
 """Articl class"""
 
-from datetime import timedelta
+from datetime import timedelta, timezone
 import unicodedata
 import re
 
@@ -67,4 +67,5 @@ class Article():
             article_info['post_date'] = parser.parse(time.group(0))
         else:
             article_info['post_date'] = parser.parse(date_string)
+        article_info['post_date'] = article_info['post_date'].replace(tzinfo=timezone.utc)
         return article_info

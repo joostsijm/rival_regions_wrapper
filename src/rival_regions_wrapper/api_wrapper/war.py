@@ -63,7 +63,7 @@ class War():
         if search_result:
             seconds = int(search_result.group(0).replace('\'', ''))
             war_info['time_left'] = timedelta(seconds=seconds)
-            war_info['finish_date'] = datetime.now() + war_info['time_left']
+            war_info['finish_date'] = datetime.utcnow() + war_info['time_left']
 
         war_info['war_units'] = {}
         for war_unit in soup.select('.war_w_unit_div'):

@@ -1,7 +1,7 @@
 """Profile class"""
 
 import re
-from datetime import timedelta
+from datetime import timedelta, timezone
 
 from bs4 import BeautifulSoup
 from dateutil import parser
@@ -30,6 +30,7 @@ class Overview():
                     upgrade_date = parser.parse(time.group(0)) + timedelta(days=1)
                 elif 'today' in date_string:
                     time = re.search(r'\d\d:\d\d', date_string)
+                    upgrade_date = parser.parse(time.group(0))
                 else:
                     upgrade_date = parser.parse(date_string)
                 break
@@ -38,6 +39,7 @@ class Overview():
             auto_war = auto_war['action'].replace('war/details/', '')
         else:
             auto_war = None
+        upgrade_date = upgrade_date.replace(tzinfo=timezone.utc) if upgrade_date else None
         overview = {
             'perks': {
                 'strenght': int(soup.find('div', {'perk': 1, 'class': 'perk_source_2'}).text),

@@ -29,6 +29,7 @@ class LocalAuthentication(MiddlewareBase):
             'password': password,
             'login_method': login_method
         })
+        self.client.login()
         super().__init__()
 
     def get(self, path, add_c_var=False):
