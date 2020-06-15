@@ -87,4 +87,3 @@ class Craft():
             item = keys[item]
         self.api_wrapper.post('storage/newproduce/{}/{}'.format(item, amount))
         return True
-        

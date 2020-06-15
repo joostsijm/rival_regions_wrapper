@@ -62,4 +62,3 @@ class Perks():
 
         self.api_wrapper.post('perks/up/{}/{}'.format(perk, upgrade_type))
         return True
-        

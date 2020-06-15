@@ -13,7 +13,7 @@ RESOURCE_DICT = {
     'diamond': 'diamond'
 }
 
-class Work(object):
+class Work():
     """Wrapper class for work"""
     def __init__(self, api_wrapper):
         self.api_wrapper = api_wrapper

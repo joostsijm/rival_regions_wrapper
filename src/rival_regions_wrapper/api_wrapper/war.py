@@ -35,6 +35,7 @@ class War():
         response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         war_info = {
+            'war_id': war_id,
             'damage': int(soup.select_one('.war_w_target_o').text.replace('.', '')),
             'attack_hourly_available': bool(soup.select_one('.hide_once_war')),
         }

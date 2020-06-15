@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from dateutil import parser
 
 
-class Article(object):
+class Article():
     """Wrapper class for article"""
     def __init__(self, api_wrapper):
         self.api_wrapper = api_wrapper
