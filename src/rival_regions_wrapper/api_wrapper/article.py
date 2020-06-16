@@ -1,11 +1,11 @@
 """Articl class"""
 
-from datetime import timedelta, timezone
 import unicodedata
 import re
 
 from bs4 import BeautifulSoup
-from dateutil import parser
+
+from rival_regions_wrapper import functions
 
 
 class Article():
@@ -59,13 +59,5 @@ class Article():
 
         date_element = soup.select_one('.news_conent_title')
         date_string = date_element.text.replace('✘', '').strip()
-        if 'Yesterday' in date_string:
-            time = re.search(r'\d\d:\d\d', date_string)
-            article_info['post_date'] = parser.parse(time.group(0)) - timedelta(days=1)
-        elif 'Today' in date_string:
-            time = re.search(r'\d\d:\d\d', date_string)
-            article_info['post_date'] = parser.parse(time.group(0))
-        else:
-            article_info['post_date'] = parser.parse(date_string)
-        article_info['post_date'] = article_info['post_date'].replace(tzinfo=timezone.utc)
+        article_info['post_date'] = functions.parse_date(date_string)
         return article_info

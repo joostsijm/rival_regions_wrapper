@@ -6,6 +6,8 @@ import unicodedata
 
 from bs4 import BeautifulSoup
 
+from rival_regions_wrapper import functions
+
 
 class War():
     """Wrapper class for war"""
@@ -64,6 +66,11 @@ class War():
             seconds = int(search_result.group(0).replace('\'', ''))
             war_info['time_left'] = timedelta(seconds=seconds)
             war_info['finish_date'] = datetime.utcnow() + war_info['time_left']
+        else:
+            war_info['time_left'] = None
+            results = re.search(r'(?<=: ).*', soup.select_one('.slide_title .small').text)
+            if results:
+                war_info['finish_date'] = functions.parse_date(results.group(0))
 
         war_info['war_units'] = {}
         for war_unit in soup.select('.war_w_unit_div'):

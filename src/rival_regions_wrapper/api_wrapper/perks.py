@@ -1,10 +1,10 @@
 """Perks class"""
 
 import re
-from datetime import timedelta, timezone
 
 from bs4 import BeautifulSoup
-from dateutil import parser
+
+from rival_regions_wrapper import functions
 
 
 class Perks():
@@ -25,16 +25,8 @@ class Perks():
             if date_string:
                 upgrade_perk = int(perk['perk'])
                 date_string = re.sub(r'^.*:\s', '', soup.select_one('.perk_source_4 .small').text)
-                if 'tomorrow' in date_string:
-                    time = re.search(r'\d\d:\d\d', date_string)
-                    upgrade_date = parser.parse(time.group(0)) + timedelta(days=1)
-                elif 'today' in date_string:
-                    time = re.search(r'\d\d:\d\d', date_string)
-                    upgrade_date = parser.parse(time.group(0))
-                else:
-                    upgrade_date = parser.parse(date_string)
+                upgrade_date = functions.parse_date(date_string)
                 break
-        upgrade_date = upgrade_date.replace(tzinfo=timezone.utc) if upgrade_date else None
         perks = {
             'strenght': int(soup.find('div', {'perk': 1, 'class': 'perk_source_2'}).text),
             'education': int(soup.find('div', {'perk': 2, 'class': 'perk_source_2'}).text),
