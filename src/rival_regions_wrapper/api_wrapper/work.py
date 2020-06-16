@@ -38,7 +38,7 @@ class Work():
             factory_dict['level'] = int(re.sub(r'level\s', '', level_str.group(0)))
 
         string_list = []
-        for string in factory.select_one('.work_factory_button').strings:
+        for string in factory.select_one('.work_factory_button, .button_white').strings:
             string_list.append(string.strip())
         try:
             wage = string_list[2]
