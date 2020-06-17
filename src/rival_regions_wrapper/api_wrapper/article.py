@@ -38,7 +38,7 @@ class Article():
             'author_id': int(author['action'].replace('slide/profile/', '')),
             'region_name': region.text,
             'region_id': int(region['action'].replace('map/details/', '')),
-            'content_text': news_content.text.strip(),
+            'content_text': news_content.get_text(separator="\n", strip=True),
             'content_html': news_content.prettify(),
             'rating': int(soup.select_one('#news_number').text),
             'comments': int(soup.select_one('.news_comments_link').text)
