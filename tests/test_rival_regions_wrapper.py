@@ -34,12 +34,12 @@ def storage_keys():
     """Standard keys for storage"""
     return [
         'oil', 'ore', 'uranium', 'diamonds', 'liquid_oxygen',
-        'helium-3', 'rivalium', 'antirad', 'energy_drink', 
-        'spacerockets', 'lss', 'tanks', 'aircrafts', 'missiles', 
+        'helium-3', 'rivalium', 'antirad', 'energy_drink',
+        'spacerockets', 'lss', 'tanks', 'aircrafts', 'missiles',
         'bombers', 'battleships', 'laser_drones', 'moon_tanks', 'space_stations',
         'oil_max', 'ore_max', 'uranium_max', 'diamonds_max', 'liquid_oxygen_max',
-        'helium-3_max', 'rivalium_max', 'antirad_max', 'energy_drink_max', 
-        'spacerockets_max', 'lss_max', 'tanks_max', 'aircrafts_max', 'missiles_max', 
+        'helium-3_max', 'rivalium_max', 'antirad_max', 'energy_drink_max',
+        'spacerockets_max', 'lss_max', 'tanks_max', 'aircrafts_max', 'missiles_max',
         'bombers_max', 'battleships_max', 'laser_drones_max', 'moon_tanks_max', 'space_stations'
     ]
 
@@ -165,7 +165,8 @@ def test_war_page(api_wrapper):
     response = War(api_wrapper).page()
 
     assert isinstance(response, dict), "The response should be a dict"
-    assert isinstance(response['training_war'], int), "The training_war should be an int"
+    if response['training_war']:
+        assert isinstance(response['training_war'], int), "The training_war should be an int"
 
 @pytest.mark.vcr()
 def test_war_info(api_wrapper):
@@ -179,8 +180,10 @@ def test_war_info(api_wrapper):
     assert isinstance(response['damage'], int), "Damage should be an int"
     assert isinstance(response['attack_hourly_available'], bool), "Attack hourly should be a bool"
     assert isinstance(response['energ_drinks'], int), "Energy drinks should be an int"
-    assert isinstance(response['max_hero_name'], str), "max hero name should be a str"
-    assert isinstance(response['max_hero_damage'], int), "max hero damage should be an int"
+    if 'max_hero_name' in response:
+        assert isinstance(response['max_hero_name'], str), "max hero name should be a str"
+    if 'max_hero_damage' in response:
+        assert isinstance(response['max_hero_damage'], int), "max hero damage should be an int"
     if 'time_left' in response:
         assert isinstance(response['time_left'], timedelta), "time left should be a time delta"
     assert isinstance(response['finish_date'], datetime), "Finish date should be a date"
