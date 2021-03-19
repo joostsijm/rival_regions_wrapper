@@ -5,13 +5,21 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-from rival_regions_wrapper import RemoteAuthentication, LocalAuthentication, ApiWrapper
+from rival_regions_wrapper import LocalAuthentication, ApiWrapper
 
 
 load_dotenv()
 
+
 class MissingAuthenticationError(Exception):
     """Error for missing authentication"""
+
+
+@pytest.fixture(scope='module')
+def vcr(vcr):
+    """Set parameters vor VCR"""
+    vcr.ignore_localhost = True
+    return vcr
 
 
 @pytest.fixture(scope="module")
