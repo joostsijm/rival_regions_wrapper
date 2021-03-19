@@ -13,7 +13,7 @@ setuptools.setup(
     description="Rival Regions API wrapper",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
-    url="git@github.com:joostsijm/rival_regions_wrapper.git",
+    url="https://github.com/joostsijm/rival_regions_wrapper",
     packages=setuptools.find_packages('src'),
     package_dir={'': 'src'},
     install_requires=[
