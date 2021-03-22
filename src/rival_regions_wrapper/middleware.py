@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 import requests
 
-from .authentication_handler import AuthenticationHandler
+from rival_regions_wrapper import AuthenticationHandler
 
 
 class MiddlewareBase(ABC):
@@ -61,7 +61,7 @@ class RemoteAuthentication(MiddlewareBase):
             print('timeout')
         except requests.exceptions.RequestException as exception:
             print('request exception')
-            raise SystemExit(exception)
+            raise SystemExit(exception) from exception
         return None
 
     def post(self, path, data=None):
@@ -75,5 +75,5 @@ class RemoteAuthentication(MiddlewareBase):
             print('timeout')
         except requests.exceptions.RequestException as exception:
             print('request exception')
-            raise SystemExit(exception)
+            raise SystemExit(exception) from exception
         return None
