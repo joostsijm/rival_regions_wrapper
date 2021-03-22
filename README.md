@@ -5,20 +5,11 @@ Use at your own risk.
 ## Install
 The following steps can be used to install the package with pip:
 
-- clone the repository: `git clone git@github.com:joostsijm/rival_regions_wrapper.git`
-- use pip to install the package: `pip install rival_regions_wrapper`
-
-Alternative option:
-
-- run `pip install git+https://github.com/joostsijm/rival_regions_wrapper#egg=rival_regions_wrapper`
+```
+pip install rival_regions_wrapper
+```
 
 The package should be available globaly.
-
-### Pipenv
-When you want to add the package to a Pipfile, use the folowing command:
-```
-pipenv install -e git+https://github.com/joostsijm/rival_regions_wrapper#egg=rival_regions_wrapper
-```
 
 ## Testing
 This appplication supports unit tests, these are located in `rival_regions_wrapper/tests/`.
@@ -38,6 +29,16 @@ PASSWORD=PLACEHOLDER
 ```
 
 Replace `PLACEHOLDER` with your credentials.
+
+## Login methods
+Currently the only working login method is Google.
+If you can help me out and make the other login methods working it would be appreciated. 
+
+login methods:
+
+- google
+- vk
+- facebook
 
 ## Middleware
 The API wrapper uses middleware to decide where how to send the request.
