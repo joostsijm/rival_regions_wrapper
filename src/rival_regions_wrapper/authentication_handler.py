@@ -194,7 +194,7 @@ class AuthenticationHandler:
 
         LOGGER.info('"%s": pressing sign in button', self.username)
         browser.click(css_selector=".sa_sn.float_left.imp.gogo")
-        time.sleep(1)
+        time.sleep(2)
 
         return browser
 
