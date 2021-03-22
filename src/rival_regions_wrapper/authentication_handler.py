@@ -334,7 +334,7 @@ class AuthenticationHandler:
         if add_var_c:
             params['c'] = self.var_c
 
-        LOGGER.debug(
+        LOGGER.info(
                 '"%s" GET: "%s" var_c: %s', self.username, path, add_var_c
             )
         if self.session:
@@ -360,7 +360,7 @@ class AuthenticationHandler:
             data = {}
         data['c'] = self.var_c
 
-        LOGGER.debug('"%s" POST: "%s"', self.username, path)
+        LOGGER.info('"%s" POST: "%s"', self.username, path)
         if self.session:
             response = self.session.post(
                 "https://rivalregions.com/{}".format(path),
@@ -378,7 +378,7 @@ class AuthenticationHandler:
     @session_handler
     def send_chat(self, language, message):
         """send chat message"""
-        LOGGER.debug('"%s" CHAT: language %s', self.username, language)
+        LOGGER.info('"%s" CHAT: language %s', self.username, language)
         if self.session:
             response = self.session.get("https://rivalregions.com/#overview")
             if "Session expired, please, reload the page" in response.text:
@@ -394,7 +394,10 @@ class AuthenticationHandler:
             time.sleep(2)
             browser.type(message, id='message')
             browser.click(id='chat_send')
-            LOGGER.info('"%s" CHAT: language %s, finished sending message', self.username, language)
+            LOGGER.info(
+                '"%s" CHAT: language %s, finished sending message',
+                self.username, language
+            )
             browser.close_current_tab()
         else:
             raise NoLogginException()
@@ -402,7 +405,7 @@ class AuthenticationHandler:
     @session_handler
     def send_personal_message(self, user_id, message):
         """send personal message"""
-        LOGGER.debug('"%s" PM: user id %s', self.username, user_id)
+        LOGGER.info('"%s" PM: user id %s', self.username, user_id)
         if self.session:
             response = self.session.get("https://rivalregions.com/#overview")
             if "Session expired, please, reload the page" in response.text:
@@ -417,7 +420,9 @@ class AuthenticationHandler:
             time.sleep(2)
             browser.type(message, id='message')
             browser.click(id='chat_send')
-            LOGGER.info('user %s: finished sending message', user_id)
+            LOGGER.info(
+                    '"%s" PM: user id %s, finished sending message',
+                    self.username, user_id)
             browser.close_current_tab()
         else:
             raise NoLogginException()
@@ -425,8 +430,8 @@ class AuthenticationHandler:
     @session_handler
     def send_conference_message(self, conference_id, message):
         """send conference message"""
-        LOGGER.debug(
-                '"%s" CONF: conference id %s',
+        LOGGER.info(
+                '"%s" CONF: id %s',
                 self.username, conference_id
             )
         if self.session:
@@ -456,9 +461,9 @@ class AuthenticationHandler:
                                 ' '.join(tmp_sentence)
                             )
                         LOGGER.info(
-                            'conference %s: next message length: %s',
-                            conference_id, len(message)
-                        )
+                                '"%s" CONF: id %s, next message length: %s',
+                                self.username, conference_id, len(message)
+                            )
                         browser.type(message, id='message')
                         browser.click(id='chat_send')
                         sentence_character_count = 0
@@ -501,8 +506,8 @@ class AuthenticationHandler:
     @session_handler
     def send_conference_notification(self, conference_id, message, sound):
         """send conference notification"""
-        LOGGER.debug(
-                '"%s" CONF: conference id %s notification ',
+        LOGGER.info(
+                '"%s" CONF: id %s notification ',
                 self.username, conference_id
             )
         data = {
@@ -512,7 +517,6 @@ class AuthenticationHandler:
         }
 
         if self.session:
-            LOGGER.info('conference %s: sending notification', conference_id)
             response = self.session.post(
                 "https://rivalregions.com/rival/konffcm/{}/".format(
                     conference_id
@@ -526,4 +530,8 @@ class AuthenticationHandler:
                 raise SessionExpireException()
         else:
             raise NoLogginException()
+        LOGGER.info(
+                '"%s" CONF: id %s send notification ',
+                self.username, conference_id
+            )
         return response.text
