@@ -182,19 +182,42 @@ class AuthenticationHandler:
         auth_text2 = auth_text1[1].split('" class="sa')
         browser.go_to(auth_text2[0])
 
+        # number = 0
+
+        # browser.get_screenshot_as_file("test_{}.png".format(number))
+        # number += 1
+
         LOGGER.info('"%s": Typing in username', self.username)
         browser.type(self.username, into='Email')
 
+        # browser.get_screenshot_as_file("test_{}.png".format(number))
+        # number += 1
+
+        # with open("test_1.html", 'w') as file_obj:
+        #     file_obj.write(browser.get_page_source())
+
         LOGGER.info('"%s": pressing next button', self.username)
-        browser.click(css_selector="#identifierNext button")
+        browser.click(css_selector="#next")
         time.sleep(2)
+
+        # browser.get_screenshot_as_file("test_{}.png".format(number))
+        # number += 1
 
         LOGGER.info('"%s": Typing in password', self.username)
         browser.type(self.password, css_selector="input")
 
+        # with open("test_2.html", 'w') as file_obj:
+        #     file_obj.write(browser.get_page_source())
+
+        # browser.get_screenshot_as_file("test_{}.png".format(number))
+        # number += 1
+
         LOGGER.info('"%s": pressing sign in button', self.username)
-        browser.click(css_selector=".sa_sn.float_left.imp.gogo")
+        browser.click(css_selector="#submit")
         time.sleep(2)
+
+        # browser.get_screenshot_as_file("test_{}.png".format(number))
+        # number += 1
 
         return browser
 
@@ -371,7 +394,7 @@ class AuthenticationHandler:
             time.sleep(2)
             browser.type(message, id='message')
             browser.click(id='chat_send')
-            LOGGER.info('language %s: finished sending message', language)
+            LOGGER.info('"%s" CHAT: language %s, finished sending message', self.username, language)
             browser.close_current_tab()
         else:
             raise NoLogginException()
