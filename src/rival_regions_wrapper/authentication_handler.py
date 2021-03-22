@@ -180,21 +180,22 @@ class AuthenticationHandler:
         LOGGER.info('"%s": Login method Google', self.username)
         auth_text1 = auth_text.split('\t<a href="')
         auth_text2 = auth_text1[1].split('" class="sa')
-
         browser.go_to(auth_text2[0])
+
         LOGGER.info('"%s": Typing in username', self.username)
         browser.type(self.username, into='Email')
-        browser.click('Volgende')
+
+        LOGGER.info('"%s": pressing next button', self.username)
+        browser.click(css_selector="#identifierNext button")
         time.sleep(2)
+
         LOGGER.info('"%s": Typing in password', self.username)
         browser.type(self.password, css_selector="input")
-        if browser.exists('Sign in'):  # English
-            browser.click('Sign in')
-        elif browser.exists('Inloggen'):  # Dutch
-            browser.click('Inloggen')
+
+        LOGGER.info('"%s": pressing sign in button', self.username)
         browser.click(css_selector=".sa_sn.float_left.imp.gogo")
         time.sleep(1)
-        LOGGER.info('"%s": pressing sign in button', self.username)
+
         return browser
 
     # IDK if this is working
