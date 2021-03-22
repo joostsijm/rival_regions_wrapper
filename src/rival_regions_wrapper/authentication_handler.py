@@ -62,7 +62,6 @@ class NoLogginException(Exception):
     """Raise exception when client isn't logged in"""
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
-        LOGGER.warning('why')
         LOGGER.warning('Not logged in')
 
 
@@ -87,7 +86,6 @@ def session_handler(func):
             instance.login()
             return try_run(instance, func, *args, **kwargs)
         except NoLogginException:
-            LOGGER.warning('here?')
             instance.login()
             return try_run(instance, func, *args, **kwargs)
 
@@ -144,10 +142,13 @@ class AuthenticationHandler:
             if self.login_method in method_dict:
                 browser = method_dict[self.login_method](browser, auth_text)
             else:
-                LOGGER.info('Invallid loggin method "%s"', self.login_method)
+                LOGGER.info(
+                        '"%s": Invallid loggin method "%s"',
+                        self.username, self.login_method
+                    )
                 sys.exit()
 
-            LOGGER.debug('Get cookie')
+            LOGGER.info('"%s": Get cookie', self.username)
             phpsessid = browser.get_cookie('PHPSESSID')
             if phpsessid:
                 cookie = self.create_cookie(
@@ -157,7 +158,7 @@ class AuthenticationHandler:
                 self.write_cookie(self.username, cookie)
             else:
                 raise NoPHPsessidException()
-            LOGGER.debug('closing login tab')
+            LOGGER.debug('"%s": closing login tab', self.username)
             browser.close_current_tab()
 
         self.session = cfscrape.CloudflareScraper()
@@ -176,16 +177,16 @@ class AuthenticationHandler:
     # This is working
     def login_google(self, browser, auth_text):
         """login using Google"""
-        LOGGER.info('Login method Google')
+        LOGGER.info('"%s": Login method Google', self.username)
         auth_text1 = auth_text.split('\t<a href="')
         auth_text2 = auth_text1[1].split('" class="sa')
 
         browser.go_to(auth_text2[0])
-        LOGGER.info('Typing in username')
+        LOGGER.info('"%s": Typing in username', self.username)
         browser.type(self.username, into='Email')
         browser.click('Volgende')
         time.sleep(2)
-        LOGGER.info('Typing in password')
+        LOGGER.info('"%s": Typing in password', self.username)
         browser.type(self.password, css_selector="input")
         if browser.exists('Sign in'):  # English
             browser.click('Sign in')
@@ -193,6 +194,7 @@ class AuthenticationHandler:
             browser.click('Inloggen')
         browser.click(css_selector=".sa_sn.float_left.imp.gogo")
         time.sleep(1)
+        LOGGER.info('"%s": pressing sign in button', self.username)
         return browser
 
     # IDK if this is working
@@ -308,7 +310,9 @@ class AuthenticationHandler:
         if add_var_c:
             params['c'] = self.var_c
 
-        LOGGER.debug('"%s" GET: "%s" var_c: %s', self.username, path, add_var_c)
+        LOGGER.debug(
+                '"%s" GET: "%s" var_c: %s', self.username, path, add_var_c
+            )
         if self.session:
             response = self.session.get(
                 url='https://rivalregions.com/{}'.format(path),
