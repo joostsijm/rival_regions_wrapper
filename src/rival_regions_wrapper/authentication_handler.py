@@ -65,11 +65,11 @@ class NoLogginException(Exception):
         LOGGER.warning('Not logged in')
 
 
-class NoPHPsessidException(Exception):
-    """Raise exception when there is no PHPsessid found"""
+class NoCookieException(Exception):
+    """Raise exception when there is no cookie found"""
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
-        LOGGER.warning('No PHPsessid found')
+        LOGGER.warning('No cookie found')
 
 
 def session_handler(func):
@@ -118,8 +118,8 @@ class AuthenticationHandler:
         """Login user if needed"""
         LOGGER.info('"%s": start login, method: "%s"',
                     self.username, self.login_method)
-        cookie = self.get_cookie(self.username)
-        if cookie is None:
+        cookies = self.get_cookies(self.username)
+        if not cookies:
             LOGGER.info('"%s": no cookie, new login, method "%s"',
                         self.username, self.login_method)
             if self.login_method not in [
@@ -141,6 +141,7 @@ class AuthenticationHandler:
 
             if self.login_method in method_dict:
                 browser = method_dict[self.login_method](browser, auth_text)
+                browser = method_dict[self.login_method](browser, auth_text)
             else:
                 LOGGER.info(
                         '"%s": Invallid loggin method "%s"',
@@ -148,22 +149,43 @@ class AuthenticationHandler:
                     )
                 sys.exit()
 
-            LOGGER.info('"%s": Get cookie', self.username)
-            phpsessid = browser.get_cookie('PHPSESSID')
-            if phpsessid:
+            LOGGER.info('"%s": Get PHPSESSID', self.username)
+            browser_cookie = browser.get_cookie('PHPSESSID')
+            if browser_cookie:
                 cookie = self.create_cookie(
-                    phpsessid.get('expiry', None),
-                    phpsessid.get('value', None)
-                )
-                self.write_cookie(self.username, cookie)
+                        'PHPSESSID',
+                        browser_cookie.get('expiry', None),
+                        browser_cookie.get('value', None)
+                    )
+                cookies.append(cookie)
             else:
-                raise NoPHPsessidException()
+                raise NoCookieException()
+
+            # TODO: try to get missing 'rr_f'
+            # TODO: what's up with 'rival/googles'
+            # TODO: why doesn't PHPSESSID not work?
+
+            cookie_names = ['rr_f']
+            for cookie_name in cookie_names:
+                browser_cookie = browser.get_cookie(cookie_name)
+                if browser_cookie:
+                    cookies.append(
+                        self.create_cookie(
+                            cookie_name,
+                            browser_cookie.get('expiry', None),
+                            browser_cookie.get('value', None)
+                        )
+                    )
+                else:
+                    raise NoCookieException()
+
+            self.write_cookies(self.username, cookies)
             LOGGER.debug('"%s": closing login tab', self.username)
             browser.close_current_tab()
 
         self.session = cfscrape.CloudflareScraper()
-        self.cookie = cookie
-        self.session.cookies.set(**cookie)
+        for cookie in cookies:
+            self.session.cookies.set(**cookie)
 
         LOGGER.debug('"%s": set the var_c', self.username)
         response = self.session.get('https://rivalregions.com/#overview')
@@ -182,42 +204,42 @@ class AuthenticationHandler:
         auth_text2 = auth_text1[1].split('" class="sa')
         browser.go_to(auth_text2[0])
 
-        # number = 0
+        number = 0
 
-        # browser.get_screenshot_as_file("test_{}.png".format(number))
-        # number += 1
+        browser.get_screenshot_as_file("test_{}.png".format(number))
+        number += 1
 
         LOGGER.info('"%s": Typing in username', self.username)
         browser.type(self.username, into='Email')
 
-        # browser.get_screenshot_as_file("test_{}.png".format(number))
-        # number += 1
+        browser.get_screenshot_as_file("test_{}.png".format(number))
+        number += 1
 
-        # with open("test_1.html", 'w') as file_obj:
-        #     file_obj.write(browser.get_page_source())
+        with open("test_1.html", 'w') as file_obj:
+            file_obj.write(browser.get_page_source())
 
         LOGGER.info('"%s": pressing next button', self.username)
         browser.click(css_selector="#next")
         time.sleep(2)
 
-        # browser.get_screenshot_as_file("test_{}.png".format(number))
-        # number += 1
+        browser.get_screenshot_as_file("test_{}.png".format(number))
+        number += 1
 
         LOGGER.info('"%s": Typing in password', self.username)
         browser.type(self.password, css_selector="input")
 
-        # with open("test_2.html", 'w') as file_obj:
-        #     file_obj.write(browser.get_page_source())
+        with open("test_2.html", 'w') as file_obj:
+            file_obj.write(browser.get_page_source())
 
-        # browser.get_screenshot_as_file("test_{}.png".format(number))
-        # number += 1
+        browser.get_screenshot_as_file("test_{}.png".format(number))
+        number += 1
 
         LOGGER.info('"%s": pressing sign in button', self.username)
         browser.click(css_selector="#submit")
         time.sleep(2)
 
-        # browser.get_screenshot_as_file("test_{}.png".format(number))
-        # number += 1
+        browser.get_screenshot_as_file("test_{}.png".format(number))
+        number += 1
 
         return browser
 
@@ -255,7 +277,7 @@ class AuthenticationHandler:
         return browser
 
     @classmethod
-    def write_cookie(cls, username, cookie):
+    def write_cookies(cls, username, cookies):
         """Write cookie to file"""
         LOGGER.info('Saving cookie for "%s"', username)
         cookies = None
@@ -264,38 +286,43 @@ class AuthenticationHandler:
                 cookies = json.load(cookies_file)
         except FileNotFoundError:
             cookies = {}
-        cookies[username] = {
-            'expires': cookie['expires'],
-            'value': cookie['value'],
-        }
+        for cookie_name, cookie in cookies.items():
+            cookies[username] = {
+                    cookie_name: {
+                        'expires': cookie['expires'],
+                        'value': cookie['value'],
+                    }
+            }
         with open('{}/cookies.json'.format(DATA_DIR), 'w+') as cookies_file:
             json.dump(cookies, cookies_file)
         LOGGER.info('Saved cookie for "%s"', username)
 
     @classmethod
-    def get_cookie(cls, username):
+    def get_cookies(cls, username):
         """Read cookies for username"""
         LOGGER.info('"%s": Reading cookie', username)
+        cookies = []
         try:
             with open('{}/cookies.json'.format(DATA_DIR), 'r') as cookies_file:
-                cookies = json.load(cookies_file)
-                for cookie_username, cookie in cookies.items():
-                    if cookie_username == username:
-                        LOGGER.info('"%s": Found cookie', username)
-                        expires = datetime.fromtimestamp(
-                                int(cookie['expires'])
-                            )
-                        if datetime.now() >= expires:
-                            LOGGER.info('"%s": Cookie is expired', username)
-                            return None
-                        cookie = cls.create_cookie(
-                            cookie['expires'],
-                            cookie['value'],
-                        )
-                        return cookie
+                for cookie_username, user_cookies in json.load(cookies_file).items():
+                    if cookie_username == user_cookies:
+                        LOGGER.info('"%s": Found cookies', username)
+                        for cookie_name, cookie in user_cookies.items():
+                            expires = datetime.fromtimestamp(
+                                    int(cookie['expires'])
+                                )
+                            if datetime.now() >= expires:
+                                LOGGER.info('"%s": Cookie is expired', username)
+                                return None
+                            cookies.append(cls.create_cookie(
+                                cookie_name,
+                                cookie['expires'],
+                                cookie['value'],
+                            ))
+                        return cookies
         except FileNotFoundError:
             pass
-        return None
+        return cookies
 
     @classmethod
     def remove_cookie(cls, username):
@@ -313,11 +340,11 @@ class AuthenticationHandler:
         LOGGER.info('Removed cookie for "%s"', username)
 
     @staticmethod
-    def create_cookie(expires, value):
+    def create_cookie(name, expires, value):
         """Create cookie"""
         return {
             'domain': 'rivalregions.com',
-            'name': 'PHPSESSID',
+            'name': name,
             'path': '/',
             'secure': False,
             'expires': expires,
@@ -385,7 +412,8 @@ class AuthenticationHandler:
                 raise SessionExpireException()
             browser = Browser(showWindow=self.show_window)
             browser.go_to('https://rivalregions.com/')
-            browser.add_cookie(self.get_cookie(self.username))
+            for cookie in self.get_cookies(self.username):
+                browser.add_cookie(cookie)
             browser.go_to(
                     'https://rivalregions.com/#slide/chat/lang_{}'
                     .format(language)
@@ -412,7 +440,8 @@ class AuthenticationHandler:
                 raise SessionExpireException()
             browser = Browser(showWindow=self.show_window)
             browser.go_to('https://rivalregions.com/')
-            browser.add_cookie(self.get_cookie(self.username))
+            for cookie in self.get_cookies(self.username):
+                browser.add_cookie(cookie)
             browser.go_to(
                     'https://rivalregions.com/#messages/{}'.format(user_id)
                 )
@@ -440,7 +469,8 @@ class AuthenticationHandler:
                 raise SessionExpireException()
             browser = Browser(showWindow=self.show_window)
             browser.go_to('https://rivalregions.com/')
-            browser.add_cookie(self.get_cookie(self.username))
+            for cookie in self.get_cookies(self.username):
+                browser.add_cookie(cookie)
             browser.go_to(
                     'https://rivalregions.com/#slide/conference/{}'
                     .format(conference_id)
