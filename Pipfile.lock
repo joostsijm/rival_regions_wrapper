@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9caab9704beb8ff3db73bfcde37140d67db8646ced74d49051ed489cc2448663"
+            "sha256": "0dd337cbf37b84a6f33a7a2918dfc66e8cc5eb8448458033b4d3426129ac70c2"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -88,6 +88,14 @@
             "index": "pypi",
             "version": "==2.25.1"
         },
+        "rival-regions-wrapper": {
+            "hashes": [
+                "sha256:93765932526f5a1af87f35d414a84cfe6cf232862827b6e2c480d51663093422",
+                "sha256:db73e5851088ae8531a09ddd451a05f437e64f7c8776e645a92d9a9756b3d1db"
+            ],
+            "index": "pypi",
+            "version": "==1.1.3"
+        },
         "selenium": {
             "hashes": [
                 "sha256:2d7131d7bc5a5b99a2d9b04aaf2612c411b03b8ca1b1ee8d3de5845a9be2cb3c",
@@ -137,6 +145,14 @@
             "index": "pypi",
             "version": "==1.4.4"
         },
+        "atomicwrites": {
+            "hashes": [
+                "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197",
+                "sha256:ae70396ad1a434f9c7046fd2dd196fc04b12f9e91ffb859164193be8b6168a7a"
+            ],
+            "markers": "sys_platform == 'win32'",
+            "version": "==1.4.0"
+        },
         "attrs": {
             "hashes": [
                 "sha256:31b2eced602aa8423c2aea9c76a724617ed67cf9513173fd3a4f03e3a929c7e6",
@@ -144,6 +160,14 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==20.3.0"
+        },
+        "colorama": {
+            "hashes": [
+                "sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b",
+                "sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"
+            ],
+            "markers": "platform_system == 'Windows' and sys_platform == 'win32'",
+            "version": "==0.4.4"
         },
         "distlib": {
             "hashes": [

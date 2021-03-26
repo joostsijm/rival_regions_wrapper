@@ -12,8 +12,8 @@ pip install rival_regions_wrapper
 The package should be available globaly.
 
 ## Testing
-This appplication supports unit tests, these are located in `rival_regions_wrapper/tests/`.
-Intall required dependancies using `pipenv install --dev`.
+This application supports unit tests, these are located in `rival_regions_wrapper/tests/`.
+Install required dependencies using `pipenv install --dev`.
 After installing you should be able to test the python package with pytest.
 Requests are cached for quick testing using VCR.py located at `rival_regions_wrapper/tests/cassettes/`.
 If you run in problems with testing you are advised to them run again after remvong the cassettes directory.
@@ -31,13 +31,13 @@ PASSWORD=PLACEHOLDER
 Replace `PLACEHOLDER` with your credentials.
 
 ## Login methods
-Currently the only working login method is Google.
+Currently the working login methods are Google and VK.
 If you can help me out and make the other login methods working it would be appreciated. 
 
 login methods:
 
-- google
-- vk
+- google [working]
+- vk [working]
 - facebook
 
 ## Middleware
@@ -59,9 +59,9 @@ import os
 from rival_regions_wrapper import LocalAuthentication
 
 authentication = LocalAuthentication(
-  os.environ["USERNAME"],
-  os.environ["PASSWORD"],
-  os.environ["LOGIN_METHOD"]
+  os.environ["RR_USERNAME"],
+  os.environ["RR_PASSWORD"],
+  os.environ["RR_LOGIN_METHOD"]
 )
 ```
 

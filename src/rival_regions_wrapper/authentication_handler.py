@@ -122,13 +122,6 @@ class AuthenticationHandler:
         if cookie is None:
             LOGGER.info('"%s": no cookie, new login, method "%s"',
                         self.username, self.login_method)
-            if self.login_method not in [
-                        "g", "google", "v", "vk", "f", "facebook"
-                    ]:
-                raise RRClientException("Not a valid login method.")
-
-            auth_text = requests.get("https://rivalregions.com").text
-            browser = Browser(showWindow=self.show_window)
 
             method_dict = {
                 'g': self.login_google,
@@ -139,14 +132,16 @@ class AuthenticationHandler:
                 'facebook': self.login_facebook,
             }
 
-            if self.login_method in method_dict:
-                browser = method_dict[self.login_method](browser, auth_text)
-            else:
-                LOGGER.info(
-                        '"%s": Invallid loggin method "%s"',
-                        self.username, self.login_method
-                    )
-                sys.exit()
+            if type(self.login_method) is not str:
+                raise RRClientException(f"{self.login_method} is not a valid login method.")
+
+            if self.login_method.lower() not in method_dict.keys():
+                raise RRClientException(f"{self.login_method} is not a valid login method.")
+
+            auth_text = requests.get("https://rivalregions.com").text
+            browser = Browser(showWindow=self.show_window)
+
+            browser = method_dict[self.login_method.lower()](browser, auth_text)
 
             LOGGER.info('"%s": Get cookie', self.username)
             phpsessid = browser.get_cookie('PHPSESSID')
@@ -221,7 +216,7 @@ class AuthenticationHandler:
 
         return browser
 
-    # IDK if this is working
+    # This is working
     def login_vk(self, browser, auth_text):
         """login using VK"""
         LOGGER.info('Login method VK')
