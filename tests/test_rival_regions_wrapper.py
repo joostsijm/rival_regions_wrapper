@@ -265,6 +265,17 @@ def test_work_info(api_wrapper):
     assert isinstance(response['resources_left'], dict), "Resources left should be a dict"
     assert isinstance(response['work_exp'], dict), "Work exp should be a dict"
 
+@pytest.mark.vcr()
+def test_work_do_work(api_wrapper):
+    response = Work(api_wrapper).work()
+    if not response:
+        assert isinstance(response ,bool), "Should be False if can't work"
+    else:
+        assert isinstance(response['factory'], str), "The factory should be a string with name"
+        assert isinstance(response['factory_type'], str), "The factory type should be a string of factory type"
+        assert isinstance(response['income'][0], int), "The income first index should be a integer"
+        assert isinstance(response['income'][1], str), "The income second index should be a string of units"
+
 @pytest.fixture
 def article_keys():
     """Standard key fro article"""

@@ -101,8 +101,9 @@ class AuthenticationHandler:
     password = None
     session = None
 
-    def __init__(self, show_window=False):
+    def __init__(self, show_window=False, new_cookie=False):
         self.show_window = show_window
+        self.new_cookie = new_cookie
         LOGGER.info('Initialize authentication handler, show window: "%s"',
                     self.show_window)
 
@@ -119,7 +120,7 @@ class AuthenticationHandler:
         LOGGER.info('"%s": start login, method: "%s"',
                     self.username, self.login_method)
         cookie = self.get_cookie(self.username)
-        if cookie is None:
+        if cookie is None or self.new_cookie:
             LOGGER.info('"%s": no cookie, new login, method "%s"',
                         self.username, self.login_method)
 

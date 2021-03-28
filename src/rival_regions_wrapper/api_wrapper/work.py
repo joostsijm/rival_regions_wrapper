@@ -3,6 +3,8 @@
 import re
 
 from bs4 import BeautifulSoup
+import logging
+LOGGER = logging.getLogger('rival_regions_wrapper.authentication_handler')
 
 
 RESOURCE_DICT = {
@@ -18,6 +20,40 @@ class Work():
     """Wrapper class for work"""
     def __init__(self, api_wrapper):
         self.api_wrapper = api_wrapper
+
+    # TODO ENERGY
+    # def energy(self):
+    #    """Get current amount of energy"""
+    #    response = self.api_wrapper.get(path)
+
+    def work(self, amount=1, mentor=0):
+        """Work at given factory ID. Amount needs to be energy / 10."""
+        response = self.api_wrapper.post(f'factory/go/{amount}/{mentor}/')
+        soup = BeautifulSoup(response, 'html.parser')
+        """if str(soup.select_one('h1').text.replace('\xa0▶','')) == 'You need residency to work in this region ':
+            LOGGER.info(str(soup))
+            return False
+        else:"""
+        #factory = str(soup.select_one('h1').text.split('\xa0▶')[0])
+        #factory_type = str(soup.select_one('h1').text.split('\xa0▶')[1])
+        #income = str(soup.select_one('div.minwidth.imp').select('.work_results2')[-1].
+        #             select('span')[-1].text.replace('.', ''))
+        #LOGGER.info(str(soup.select_one('div.minwidth.imp').select('.work_results2')))
+        LOGGER.info(str([i for i in soup.stripped_strings]))
+        #  ['IndX GOLD', '▶', 'Gold mine', '—10 E\t\t\t\t\t\t\t\t\t\t\t (+9)', 'Working experience: +1 Pt.',
+        #  '0 $', 'Exp: +20', 'Total: 6900420', 'Taxes: +0 $ (10%)', 'Total: 5.657.542.880.418 $',
+        #  'Work again', 'Auto']
+        #income = [i.strip("+") for i in income.split(" ")]  # Split units from value and remove sign
+        #LOGGER.info(str(income))
+        #income[0] = int(income[0])  # Convert first part to an integer, second will be the units
+
+        #worked_info = {
+        #    'factory': factory,
+        #    'factory_type': factory_type,
+        #    'income': income
+        #}
+#
+        return ''# worked_info
 
     def page(self):
         """Get work page"""
