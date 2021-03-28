@@ -18,7 +18,6 @@ requests = "*"
 webbot = "*"
 python-dateutil = "*"
 pathlib2 = "*"
-rival-regions-wrapper = "*"
 
 [requires]
 python_version = "3"
