@@ -3,9 +3,6 @@
 import re
 
 from bs4 import BeautifulSoup
-import logging
-LOGGER = logging.getLogger('rival_regions_wrapper.authentication_handler')
-
 
 RESOURCE_DICT = {
     'oil': 'oil',
@@ -21,39 +18,38 @@ class Work():
     def __init__(self, api_wrapper):
         self.api_wrapper = api_wrapper
 
-    # TODO ENERGY
-    # def energy(self):
-    #    """Get current amount of energy"""
-    #    response = self.api_wrapper.get(path)
+    def switch_factory(self, factory_id):
+        """Switch factory based on factory_id"""
+        response = self.api_wrapper.post('factory/assign',
+                                         data={'factory': factory_id})
+        return response
 
     def work(self, amount=1, mentor=0):
+        pass
+
+        # TODO GET THE ORDER OF ALL FACTORY TYPES
+        # TODO ASSUME GOLD WILL BE ONLY WEIRD TYPE
+
         """Work at given factory ID. Amount needs to be energy / 10."""
         response = self.api_wrapper.post(f'factory/go/{amount}/{mentor}/')
         soup = BeautifulSoup(response, 'html.parser')
-        """if str(soup.select_one('h1').text.replace('\xa0▶','')) == 'You need residency to work in this region ':
-            LOGGER.info(str(soup))
-            return False
-        else:"""
-        #factory = str(soup.select_one('h1').text.split('\xa0▶')[0])
-        #factory_type = str(soup.select_one('h1').text.split('\xa0▶')[1])
-        #income = str(soup.select_one('div.minwidth.imp').select('.work_results2')[-1].
-        #             select('span')[-1].text.replace('.', ''))
-        #LOGGER.info(str(soup.select_one('div.minwidth.imp').select('.work_results2')))
-        LOGGER.info(str([i for i in soup.stripped_strings]))
-        #  ['IndX GOLD', '▶', 'Gold mine', '—10 E\t\t\t\t\t\t\t\t\t\t\t (+9)', 'Working experience: +1 Pt.',
+
+        self.api_wrapper.authentication.client.LOGGER.info(str([i.replace('\t','') for i in soup.stripped_strings]))
+
+        # GOLD MINE OUTPUT
+        #  ['IndX GOLD', '▶', 'Gold mine', '—10 E (+9)', 'Working experience: +1 Pt.',
         #  '0 $', 'Exp: +20', 'Total: 6900420', 'Taxes: +0 $ (10%)', 'Total: 5.657.542.880.418 $',
         #  'Work again', 'Auto']
-        #income = [i.strip("+") for i in income.split(" ")]  # Split units from value and remove sign
-        #LOGGER.info(str(income))
-        #income[0] = int(income[0])  # Convert first part to an integer, second will be the units
 
-        #worked_info = {
-        #    'factory': factory,
-        #    'factory_type': factory_type,
-        #    'income': income
-        #}
-#
-        return ''# worked_info
+        # OIL MINE OUTPUT 0% WAGE
+        # ['IndX Oil', '▶', 'Oil field', '—10 E (+9)', 'Working experience: +1 Pt.', 'Exp: +20',
+        # 'Total: 120660', '+714.962 bbl', 'Taxes: +0 $ (10%)', 'Total: 5.591.261.983.800 $', '+79.440 bbl (10%)',
+        # 'Total: 8.716.264.048', 'Work again', 'Auto']
+
+        # Current order - Need more research
+        # [factory name, hymn symbol, factory type, energy used (+9? what's this?), working experience gained, xp gain,
+        # total you have, # total factory gains?, taxes, total region has, total region gains resource, total region has
+        # of the resource, work again and auto work buttons]
 
     def page(self):
         """Get work page"""
