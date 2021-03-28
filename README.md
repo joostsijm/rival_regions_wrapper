@@ -19,13 +19,13 @@ Requests are cached for quick testing using VCR.py located at `rival_regions_wra
 If you run in problems with testing you are advised to them run again after remvong the cassettes directory.
 
 The tests read login credentials from the following environment variables:
-`LOGIN_METHOD`, `USERNAME`, `PASSWORD`.
+`RR_LOGIN_METHOD`, `RR_USERNAME`, `RR_PASSWORD`.
 You can set those by creating an file named `.env` with te following:
 
 ```
-LOGIN_METHOD=PLACEHOLDER
-USERNAME=PLACEHOLDER
-PASSWORD=PLACEHOLDER
+RR_LOGIN_METHOD=PLACEHOLDER
+RR_USERNAME=PLACEHOLDER
+RR_PASSWORD=PLACEHOLDER
 ```
 
 Replace `PLACEHOLDER` with your credentials.
