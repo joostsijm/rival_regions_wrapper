@@ -109,15 +109,21 @@ def test_perks_info(api_wrapper, perks_keys):
     assert isinstance(response['strenght'], int), "strengt should be an int"
     assert isinstance(response['education'], int), "educatino should be an int"
     assert isinstance(response['endurance'], int), "endurance should be an int"
-    assert isinstance(response['upgrade_date'], datetime), "upgrade_date should be a date"
-    assert isinstance(response['upgrade_perk'], int), "upgrade_perk should be an int"
+
+    try:
+        assert isinstance(response['upgrade_date'], datetime), "upgrade_date should be a date"
+        assert isinstance(response['upgrade_perk'], int), "upgrade_perk should be an int"
+    except AssertionError:
+        assert isinstance(response['upgrade_date'], type(None)), "upgrade_date should be None if not upgrading"
+        assert isinstance(response['upgrade_perk'], type(None)), "upgrade_perk should be an int"
+
 
 @pytest.mark.skip(reason="Update request")
 def test_perks_upgrade(api_wrapper):
     """Test an API call to upgrade perk"""
     perk = 'endurance'
     upgrade_type = 'money'
-    Perks.upgrade(perk, upgrade_type )
+    Perks.upgrade(perk, upgrade_type)
 
 @pytest.fixture
 def craft_keys():
