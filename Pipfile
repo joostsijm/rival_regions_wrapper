@@ -18,6 +18,8 @@ requests = "*"
 webbot = "*"
 python-dateutil = "*"
 pathlib2 = "*"
+selenium-stealth= "*"
+selenium = "*"
 
 [requires]
 python_version = "3"
