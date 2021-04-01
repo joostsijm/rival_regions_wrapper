@@ -154,7 +154,9 @@ class AuthenticationHandler:
             if browser_cookie:
                 expiry = browser_cookie.get('expiry', None)
                 value = browser_cookie.get('value', None)
-                LOGGER.info(f'"value": {value}, "expiry": {expiry}')
+                LOGGER.info('"{}": "value": {}, "expiry": {}'.format(
+                        self.username, value, expiry
+                    ))
                 cookie = self.create_cookie(
                         'PHPSESSID',
                         expiry,
@@ -170,7 +172,9 @@ class AuthenticationHandler:
             for cookie_name in cookie_names:
                 browser_cookie = browser.get_cookie(cookie_name)
                 if browser_cookie:
-                    LOGGER.info(f'"{self.username}": Get {cookie_name}')
+                    LOGGER.info('"{}": Get {}'.format(
+                        self.username, cookie_name
+                    ))
                     expiry = browser_cookie.get('expiry', None)
                     value = browser_cookie.get('value', None)
                     cookies.append(
@@ -180,7 +184,9 @@ class AuthenticationHandler:
                             value
                         )
                     )
-                    LOGGER.info(f'"value": {value}, "expiry": {expiry}')
+                    LOGGER.info('"{}": "value": {}, "expiry": {}'.format(
+                            self.username, value, expiry
+                        ))
                 else:
                     raise NoCookieException()
 
@@ -272,7 +278,7 @@ class AuthenticationHandler:
     @classmethod
     def write_cookies(cls, username, passed_cookies):
         """Write cookie to file"""
-        LOGGER.info('Saving cookie for "%s"', username)
+        LOGGER.info('"%s": Saving cookie', username)
         cookies = None
         try:
             with open('{}/cookies.json'.format(DATA_DIR), 'r') as cookies_file:
@@ -283,7 +289,6 @@ class AuthenticationHandler:
             cookies = {username : {}}
         if username not in cookies:
             cookies[username] = {}
-        LOGGER.info(cookies)
         for cookie in passed_cookies:
             cookies[username][cookie['name']] = {
                 'expiry': cookie['expires'],
@@ -292,7 +297,7 @@ class AuthenticationHandler:
 
         with open('{}/cookies.json'.format(DATA_DIR), 'w+') as cookies_file:
             json.dump(cookies, cookies_file)
-        LOGGER.info('Saved cookie for "%s"', username)
+        LOGGER.info('"%s": Saved cookie for', username)
 
     @classmethod
     def get_cookies(cls, username):
@@ -325,7 +330,7 @@ class AuthenticationHandler:
     @classmethod
     def remove_cookie(cls, username):
         """Remove cookie from storage"""
-        LOGGER.info('Removing cookie for "%s"', username)
+        LOGGER.info('"%s": Removing cookie for', username)
         cookies = None
         try:
             with open('{}/cookies.json'.format(DATA_DIR), 'r') as cookies_file:
@@ -335,7 +340,7 @@ class AuthenticationHandler:
         cookies.pop(username, None)
         with open('{}/cookies.json'.format(DATA_DIR), 'w+') as cookies_file:
             json.dump(cookies, cookies_file)
-        LOGGER.info('Removed cookie for "%s"', username)
+        LOGGER.info('"%s": Removed cookie', username)
 
     @staticmethod
     def create_cookie(name, expiry, value):
