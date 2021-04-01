@@ -24,6 +24,7 @@ setuptools.setup(
         "pathlib2",
         "requests",
         "selenium-stealth",
+        "webbot",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
