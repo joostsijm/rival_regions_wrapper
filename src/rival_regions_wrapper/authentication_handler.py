@@ -103,6 +103,7 @@ class AuthenticationHandler:
 
     def __init__(self, show_window=False):
         self.show_window = show_window
+        self.LOGGER = LOGGER
         LOGGER.info('Initialize authentication handler, show window: "%s"',
                     self.show_window)
 
