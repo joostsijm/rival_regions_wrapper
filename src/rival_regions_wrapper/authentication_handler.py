@@ -13,7 +13,7 @@ import pathlib2
 
 import requests
 import cfscrape
-from webbot.webbot import Browser
+from .browser import StealthBrowser as Browser
 from appdirs import user_data_dir
 
 
@@ -115,6 +115,7 @@ class AuthenticationHandler:
         self.login()
 
     def login(self):
+        self.remove_cookie(self.username)
         """Login user if needed"""
         LOGGER.info('"%s": start login, method: "%s"',
                     self.username, self.login_method)
@@ -140,7 +141,6 @@ class AuthenticationHandler:
             }
 
             if self.login_method in method_dict:
-                browser = method_dict[self.login_method](browser, auth_text)
                 browser = method_dict[self.login_method](browser, auth_text)
             else:
                 LOGGER.info(
@@ -209,45 +209,31 @@ class AuthenticationHandler:
         LOGGER.info('"%s": Login method Google', self.username)
         auth_text1 = auth_text.split('\t<a href="')
         auth_text2 = auth_text1[1].split('" class="sa')
+        time.sleep(1)
         browser.go_to(auth_text2[0])
-
-        number = 0
-
-        browser.get_screenshot_as_file("test_{}.png".format(number))
-        number += 1
 
         LOGGER.info('"%s": Typing in username', self.username)
         browser.type(self.username, into='Email')
-
-        browser.get_screenshot_as_file("test_{}.png".format(number))
-        number += 1
-
-        with open("test_1.html", 'w') as file_obj:
-            file_obj.write(browser.get_page_source())
 
         LOGGER.info('"%s": pressing next button', self.username)
         browser.click(css_selector="#next")
         time.sleep(2)
 
-        browser.get_screenshot_as_file("test_{}.png".format(number))
-        number += 1
-
         LOGGER.info('"%s": Typing in password', self.username)
         browser.type(self.password, css_selector="input")
 
-        with open("test_2.html", 'w') as file_obj:
-            file_obj.write(browser.get_page_source())
-
-        browser.get_screenshot_as_file("test_{}.png".format(number))
-        number += 1
-
         LOGGER.info('"%s": pressing sign in button', self.username)
         browser.click(css_selector="#submit")
-        time.sleep(2)
+        time.sleep(3)
 
-        browser.get_screenshot_as_file("test_{}.png".format(number))
-        number += 1
-
+        # Some why it wont click and login immediately. This seems to work
+        time.sleep(1)
+        browser.go_to(auth_text2[0])
+        time.sleep(1)
+        browser.go_to(auth_text2[0])
+        time.sleep(1)
+        browser.click(css_selector="#sa_add2 > div:nth-child(4) > a.sa_link.gogo > div")
+        time.sleep(3)
         return browser
 
     # IDK if this is working
@@ -295,6 +281,8 @@ class AuthenticationHandler:
                 raise FileNotFoundError # raise error as if file hadn't been found
         except FileNotFoundError:
             cookies = {username : {}}
+        if username not in cookies:
+            cookies[username] = {}
         LOGGER.info(cookies)
         for cookie in passed_cookies:
             cookies[username][cookie['name']] = {
