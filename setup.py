@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="rival_regions_wrapper",
-    version="1.2.0",
+    version="1.2.1",
     author="Joost Sijm",
     author_email="joostsijm@gmail.com",
     description="Rival Regions API wrapper",
@@ -20,10 +20,10 @@ setuptools.setup(
         "appdirs",
         "beautifulsoup4",
         "cfscrape",
-        "requests",
-        "webbot",
         "python-dateutil",
         "pathlib2",
+        "requests",
+        "selenium-stealth",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
