@@ -9,14 +9,14 @@ The following steps can be used to install the package with pip:
 pip install rival_regions_wrapper
 ```
 
-The package should be available globaly.
+The package should be available globally.
 
 ## Testing
 This appplication supports unit tests, these are located in `rival_regions_wrapper/tests/`.
 Intall required dependancies using `pipenv install --dev`.
 After installing you should be able to test the python package with pytest.
 Requests are cached for quick testing using VCR.py located at `rival_regions_wrapper/tests/cassettes/`.
-If you run in problems with testing you are advised to them run again after remvong the cassettes directory.
+If you run in problems with testing you are advised to them run again after removing the cassettes directory.
 
 The tests read login credentials from the following environment variables:
 `LOGIN_METHOD`, `USERNAME`, `PASSWORD`.
@@ -29,6 +29,10 @@ PASSWORD=PLACEHOLDER
 ```
 
 Replace `PLACEHOLDER` with your credentials.
+
+Also must have the chromedriver which can be found here https://sites.google.com/a/chromium.org/chromedriver/home 
+
+Add this to the system `PATH` environmental variable.
 
 ## Login methods
 Currently the only working login method is Google.
