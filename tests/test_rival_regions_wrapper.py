@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import pytest
 
 from rival_regions_wrapper.api_wrapper import Profile, Storage, Market, ResourceState, Perks, \
-    Craft, Overview, War, Work, Article
+    Craft, Overview, War, Work, Article, Conference
 
 
 @pytest.fixture
@@ -323,3 +323,10 @@ def test_article_info_two(api_wrapper, article_keys):
     assert isinstance(response['rating'], int), "Rating should be an integer"
     assert isinstance(response['comments'], int), "Comments should be an integer"
     assert isinstance(response['post_date'], datetime), "Post date should be a datetime"
+
+# @pytest.mark.skip(reason="message request")
+def test_conference_message(api_wrapper):
+    """Test conference message"""
+    conference_id = 439289
+    response = Conference(api_wrapper).send_message(conference_id, 'hi')
+

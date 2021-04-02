@@ -5,7 +5,7 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-from rival_regions_wrapper import LocalAuthentication, ApiWrapper
+from rival_regions_wrapper import LocalAuthentication
 
 
 load_dotenv()
@@ -33,5 +33,4 @@ def api_wrapper():
             'Load the following variables in your user environment: '
             'username, password, login_method'
         )
-    authentication = LocalAuthentication(username, password, login_method)
-    return ApiWrapper(authentication)
+    return LocalAuthentication(username, password, login_method)

@@ -52,7 +52,7 @@ class LocalAuthentication(MiddlewareBase):
 
     def send_conference_notification(self, conference_id, message, sound):
         """Send conference notification"""
-        return self.client.send_conference_notification(conference_id, message, sound):
+        return self.client.send_conference_notification(conference_id, message, sound)
 
 class RemoteAuthentication(MiddlewareBase):
     """Remote authentication"""

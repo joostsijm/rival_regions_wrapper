@@ -116,7 +116,6 @@ class AuthenticationHandler:
         self.login()
 
     def login(self):
-        self.remove_cookie(self.username)
         """Login user if needed"""
         LOGGER.info('"%s": start login, method: "%s"',
                     self.username, self.login_method)
@@ -195,7 +194,7 @@ class AuthenticationHandler:
             LOGGER.debug('"%s": closing login tab', self.username)
             browser.close_current_tab()
         else:
-            LOGGER.info('Cookies found')
+            LOGGER.info('"%s": Cookies found', self.username)
 
         self.session = cfscrape.CloudflareScraper()
         for cookie in cookies:
@@ -298,7 +297,7 @@ class AuthenticationHandler:
 
         with open('{}/cookies.json'.format(DATA_DIR), 'w+') as cookies_file:
             json.dump(cookies, cookies_file)
-        LOGGER.info('"%s": Saved cookie for', username)
+        LOGGER.info('"%s": Saved cookie', username)
 
     @classmethod
     def get_cookies(cls, username):
@@ -331,7 +330,7 @@ class AuthenticationHandler:
     @classmethod
     def remove_cookie(cls, username):
         """Remove cookie from storage"""
-        LOGGER.info('"%s": Removing cookie for', username)
+        LOGGER.info('"%s": Removing cookie', username)
         cookies = None
         try:
             with open('{}/cookies.json'.format(DATA_DIR), 'r') as cookies_file:
@@ -464,17 +463,19 @@ class AuthenticationHandler:
     def send_conference_message(self, conference_id, message):
         """send conference message"""
         LOGGER.info(
-                '"%s" CONF: id %s',
+                '"%s": CONF "%s": send message',
                 self.username, conference_id
             )
         if self.session:
             response = self.session.get("https://rivalregions.com/#overview")
             if "Session expired, please, reload the page" in response.text:
                 raise SessionExpireException()
-            browser = Browser(showWindow=self.show_window)
+            browser = Browser(showWindow=True)
             browser.go_to('https://rivalregions.com/')
-            for cookie in self.get_cookies(self.username):
-                browser.add_cookie(cookie)
+            for cookie_name, value in self.session.cookies.get_dict().items():
+                browser.add_cookie(
+                    self.create_cookie(cookie_name, None, value)
+                )
             browser.go_to(
                     'https://rivalregions.com/#slide/conference/{}'
                     .format(conference_id)
@@ -495,7 +496,7 @@ class AuthenticationHandler:
                                 ' '.join(tmp_sentence)
                             )
                         LOGGER.info(
-                                '"%s" CONF: id %s, next message length: %s',
+                                '"%s": CONF "%s": next message length: %s',
                                 self.username, conference_id, len(message)
                             )
                         browser.type(message, id='message')
@@ -523,15 +524,15 @@ class AuthenticationHandler:
             if tmp_messages:
                 message = '\n'.join(tmp_messages)
                 LOGGER.info(
-                        'conference %s: next message length: %s',
-                        conference_id, len(message)
+                        '"%s": CONF "%s": next message length: %s',
+                        self.username, conference_id, len(message)
                     )
                 browser.type(message, id='message')
                 browser.click(id='chat_send')
 
             LOGGER.info(
-                    'conference %s: finished sending message',
-                    conference_id
+                    '"%s": CONF "%s": finished sending message',
+                    self.username, conference_id
                 )
             browser.close_current_tab()
         else:
@@ -541,7 +542,7 @@ class AuthenticationHandler:
     def send_conference_notification(self, conference_id, message, sound):
         """send conference notification"""
         LOGGER.info(
-                '"%s" CONF: id %s notification ',
+                '"%s": CONF: %s notification',
                 self.username, conference_id
             )
         data = {
