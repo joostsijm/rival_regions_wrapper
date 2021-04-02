@@ -470,7 +470,7 @@ class AuthenticationHandler:
             response = self.session.get("https://rivalregions.com/#overview")
             if "Session expired, please, reload the page" in response.text:
                 raise SessionExpireException()
-            browser = Browser(showWindow=True)
+            browser = Browser(showWindow=self.show_window)
             browser.go_to('https://rivalregions.com/')
             for cookie_name, value in self.session.cookies.get_dict().items():
                 browser.add_cookie(

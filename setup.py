@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="rival_regions_wrapper",
-    version="1.2.4",
+    version="1.2.5",
     author="Joost Sijm",
     author_email="joostsijm@gmail.com",
     description="Rival Regions API wrapper",
