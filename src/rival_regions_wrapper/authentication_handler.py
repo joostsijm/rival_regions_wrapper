@@ -121,6 +121,7 @@ class AuthenticationHandler:
                     self.username, self.login_method)
         cookies = self.get_cookies(self.username)
         if not cookies:
+            cookies = []
             LOGGER.info('"%s": no cookie, new login, method "%s"',
                         self.username, self.login_method)
             if self.login_method not in [
