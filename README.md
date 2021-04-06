@@ -60,7 +60,7 @@ Connect through a remote API using URL and authentication key.
 Create local authentication middleware and log in with environ variables
 ```python
 import os
-from rival_regions_wrapper import LocalAuthentication
+from rival_regions_wrapper.middleware import LocalAuthentication
 
 authentication = LocalAuthentication(
   os.environ["USERNAME"],
