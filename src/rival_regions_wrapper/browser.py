@@ -38,6 +38,7 @@ class Browser(webbot.Browser):
                 performing an action like click ,type etc.
     """
     def __init__(self, showWindow=True, proxy=None, downloadPath:str=None):
+        super().__init__()
         options = webdriver.ChromeOptions()
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--no-sandbox")
