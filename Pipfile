@@ -9,6 +9,7 @@ pytest = "*"
 pytest-vcr = "*"
 tox = "*"
 tox-venv = "*"
+pylint = "*"
 
 [packages]
 appdirs = "*"
