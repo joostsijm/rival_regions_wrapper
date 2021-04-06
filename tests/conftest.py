@@ -5,7 +5,7 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-from rival_regions_wrapper import LocalAuthentication
+from rival_regions_wrapper.middleware import LocalAuthentication
 
 
 load_dotenv()

@@ -8,10 +8,10 @@ import errno
 from selenium_stealth import stealth
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from webbot import Browser
+import webbot
 
 
-class StealthBrowser(Browser):
+class Browser(webbot.Browser):
     """
     **Constructor**
 
@@ -93,3 +93,11 @@ class StealthBrowser(Browser):
                     'start_session', 'stop_client', 'switch_to_alert'
                 ]:
             setattr(self, function, getattr(self.driver, function))
+
+    def add_cookie(self, cookie):
+        """To pretent lint error"""
+        self.add_cookie(cookie)
+
+    def refresh(self):
+        """To pretent lint error"""
+        self.refresh()

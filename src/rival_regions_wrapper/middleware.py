@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 import requests
 
-from rival_regions_wrapper import AuthenticationHandler
+from rival_regions_wrapper.authentication_handler import AuthenticationHandler
 
 
 class MiddlewareBase(ABC):
@@ -18,13 +18,6 @@ class MiddlewareBase(ABC):
     def post(self, path, data=None):
         """Send post request"""
 
-    @abstractmethod
-    def send_conference_message(self, conference_id, message):
-        """Send conference message"""
-
-    @abstractmethod
-    def send_conference_notification(self, conference_id, message, sound):
-        """Send conference notification"""
 
 class LocalAuthentication(MiddlewareBase):
     """Local authentication"""
@@ -46,13 +39,6 @@ class LocalAuthentication(MiddlewareBase):
         """Send post request"""
         return self.client.post(path, data=data)
 
-    def send_conference_message(self, conference_id, message):
-        """Send conference message"""
-        return self.client.send_conference_message(conference_id, message)
-
-    def send_conference_notification(self, conference_id, message, sound):
-        """Send conference notification"""
-        return self.client.send_conference_notification(conference_id, message, sound)
 
 class RemoteAuthentication(MiddlewareBase):
     """Remote authentication"""

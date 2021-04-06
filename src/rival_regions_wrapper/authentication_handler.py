@@ -10,9 +10,8 @@ import requests
 import cfscrape
 
 from rival_regions_wrapper import LOGGER
-
-from .cookie_handler import CookieHandler
-from .browser import StealthBrowser as Browser
+from rival_regions_wrapper.cookie_handler import CookieHandler
+from rival_regions_wrapper.browser import Browser
 
 
 class RRClientException(Exception):
@@ -260,18 +259,14 @@ class AuthenticationHandler:
             params['c'] = self.var_c
 
         LOGGER.info(
-                '"%s" GET: "%s" var_c: %s', self.username, path, add_var_c
+                '"%s": GET: "%s" var_c: %s', self.username, path, add_var_c
             )
         if self.session:
             response = self.session.get(
                 url='https://rivalregions.com/{}'.format(path),
                 params=params
             )
-            if "Session expired, please, reload the page" \
-                    in response.text or \
-                    'window.location="https://rivalregions.com";' \
-                    in response.text:
-                raise SessionExpireException()
+            self.check_response(response)
         else:
             raise NoLogginException()
         return response.text
@@ -285,183 +280,20 @@ class AuthenticationHandler:
             data = {}
         data['c'] = self.var_c
 
-        LOGGER.info('"%s" POST: "%s"', self.username, path)
+        LOGGER.info('"%s": POST: "%s"', self.username, path)
         if self.session:
             response = self.session.post(
                 "https://rivalregions.com/{}".format(path),
                 data=data
             )
-            if "Session expired, please, reload the page" \
-                    in response.text or \
-                    'window.location="https://rivalregions.com";' \
-                    in response.text:
-                raise SessionExpireException()
+            self.check_response(response)
         else:
             raise NoLogginException()
         return response.text
 
-    @session_handler
-    def send_chat(self, language, message):
-        """send chat message"""
-        LOGGER.info('"%s" CHAT: language %s', self.username, language)
-        if self.session:
-            response = self.session.get("https://rivalregions.com/#overview")
-            if "Session expired, please, reload the page" in response.text:
-                raise SessionExpireException()
-            browser = Browser(showWindow=self.show_window)
-            browser.go_to('https://rivalregions.com/')
-            for cookie in CookieHandler.get_cookies(self.username):
-                browser.add_cookie(cookie)
-            browser.go_to(
-                    'https://rivalregions.com/#slide/chat/lang_{}'
-                    .format(language)
-                )
-            browser.refresh()
-            time.sleep(2)
-            browser.type(message, id='message')
-            browser.click(id='chat_send')
-            LOGGER.info(
-                '"%s" CHAT: language %s, finished sending message',
-                self.username, language
-            )
-            browser.close_current_tab()
-        else:
-            raise NoLogginException()
-
-    @session_handler
-    def send_personal_message(self, user_id, message):
-        """send personal message"""
-        LOGGER.info('"%s" PM: user id %s', self.username, user_id)
-        if self.session:
-            response = self.session.get("https://rivalregions.com/#overview")
-            if "Session expired, please, reload the page" in response.text:
-                raise SessionExpireException()
-            browser = Browser(showWindow=self.show_window)
-            browser.go_to('https://rivalregions.com/')
-            for cookie in CookieHandler.get_cookies(self.username):
-                browser.add_cookie(cookie)
-            browser.go_to(
-                    'https://rivalregions.com/#messages/{}'.format(user_id)
-                )
-            browser.refresh()
-            time.sleep(2)
-            browser.type(message, id='message')
-            browser.click(id='chat_send')
-            LOGGER.info(
-                    '"%s" PM: user id %s, finished sending message',
-                    self.username, user_id)
-            browser.close_current_tab()
-        else:
-            raise NoLogginException()
-
-    @session_handler
-    def send_conference_message(self, conference_id, message):
-        """send conference message"""
-        LOGGER.info(
-                '"%s": CONF "%s": send message',
-                self.username, conference_id
-            )
-        if self.session:
-            response = self.session.get("https://rivalregions.com/#overview")
-            if "Session expired, please, reload the page" in response.text:
-                raise SessionExpireException()
-            browser = Browser(showWindow=self.show_window)
-            browser.go_to('https://rivalregions.com/')
-            for cookie_name, value in self.session.cookies.get_dict().items():
-                browser.add_cookie(
-                    CookieHandler.create_cookie(cookie_name, None, value)
-                )
-            browser.go_to(
-                    'https://rivalregions.com/#slide/conference/{}'
-                    .format(conference_id)
-                )
-            browser.refresh()
-            time.sleep(2)
-
-            character_count = 0
-            tmp_messages = []
-            for sentence in message.split('\n'):
-                sentence_character_count = 0
-                tmp_sentence = []
-                for word in sentence.split(' '):
-                    sentence_character_count += len(word) + 1
-                    if sentence_character_count >= 899:
-                        message = '{}\n{}'.format('\n'.join(
-                                tmp_messages),
-                                ' '.join(tmp_sentence)
-                            )
-                        LOGGER.info(
-                                '"%s": CONF "%s": next message length: %s',
-                                self.username, conference_id, len(message)
-                            )
-                        browser.type(message, id='message')
-                        browser.click(id='chat_send')
-                        sentence_character_count = 0
-                        tmp_sentence = []
-                        character_count = 0
-                        tmp_messages = []
-                    tmp_sentence.append(word)
-
-                sentence = ' '.join(tmp_sentence)
-                character_count += len(sentence) + 1
-                if character_count >= 900:
-                    message = '\n'.join(tmp_messages)
-                    LOGGER.info(
-                        'conference %s: next message length: %s',
-                        conference_id, len(message)
-                    )
-                    browser.type(message, id='message')
-                    browser.click(id='chat_send')
-                    character_count = 0
-                    tmp_messages = []
-                tmp_messages.append(sentence)
-
-            if tmp_messages:
-                message = '\n'.join(tmp_messages)
-                LOGGER.info(
-                        '"%s": CONF "%s": next message length: %s',
-                        self.username, conference_id, len(message)
-                    )
-                browser.type(message, id='message')
-                browser.click(id='chat_send')
-
-            LOGGER.info(
-                    '"%s": CONF "%s": finished sending message',
-                    self.username, conference_id
-                )
-            browser.close_current_tab()
-        else:
-            raise NoLogginException()
-
-    @session_handler
-    def send_conference_notification(self, conference_id, message, sound):
-        """send conference notification"""
-        LOGGER.info(
-                '"%s": CONF: %s notification',
-                self.username, conference_id
-            )
-        data = {
-            'sound': 1 if sound else 0,
-            'text': message,
-            'c': self.var_c
-        }
-
-        if self.session:
-            response = self.session.post(
-                "https://rivalregions.com/rival/konffcm/{}/".format(
-                    conference_id
-                ),
-                data=data
-            )
-            if "Session expired, please, reload the page" \
-                    in response.text or \
-                    'window.location="https://rivalregions.com";' \
-                    in response.text:
-                raise SessionExpireException()
-        else:
-            raise NoLogginException()
-        LOGGER.info(
-                '"%s" CONF: id %s send notification ',
-                self.username, conference_id
-            )
-        return response.text
+    @classmethod
+    def check_response(cls, response):
+        """Check resonse for authentication"""
+        if "Session expired, please, reload the page" in response.text or \
+                'window.location="https://rivalregions.com";' in response.text:
+            raise SessionExpireException()
