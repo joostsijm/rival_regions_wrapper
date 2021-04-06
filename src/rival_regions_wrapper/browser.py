@@ -37,8 +37,8 @@ class Browser(webbot.Browser):
         - List containing all the errors which might have occurred during
                 performing an action like click ,type etc.
     """
-    def __init__(self, showWindow=True, proxy=None, downloadPath:str=None):
-        super().__init__()
+    def __init__(self, showWindow=True, proxy=None, downloadPath=None):
+        super().__init__(showWindow, proxy, downloadPath)
         options = webdriver.ChromeOptions()
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--no-sandbox")
