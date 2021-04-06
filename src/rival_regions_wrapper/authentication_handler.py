@@ -15,16 +15,6 @@ from .cookie_storage import CookieStorage
 from .browser import StealthBrowser as Browser
 
 
-LOGIN_METHODS = {
-    'g': self.login_google,
-    'google': self.login_google,
-    'v': self.login_vk,
-    'vk': self.login_vk,
-    'f': self.login_facebook,
-    'facebook': self.login_facebook,
-}
-
-
 class RRClientException(Exception):
     """RR exception"""
     def __init__(self, *args, **kwargs):
@@ -108,14 +98,21 @@ class AuthenticationHandler:
                     '"%s": no cookie, new login, method "%s"',
                     self.username, self.login_method
                 )
-            if self.login_method not in LOGIN_METHODS:
-                raise RRClientException("Not a valid login method.")
+
+            login_methods = {
+                'g': self.login_google,
+                'google': self.login_google,
+                'v': self.login_vk,
+                'vk': self.login_vk,
+                'f': self.login_facebook,
+                'facebook': self.login_facebook,
+            }
 
             auth_text = requests.get("https://rivalregions.com").text
             browser = Browser(showWindow=self.show_window)
 
-            if self.login_method in LOGIN_METHODS:
-                browser = LOGIN_METHODS[self.login_method](browser, auth_text)
+            if self.login_method in login_methods:
+                browser = login_methods[self.login_method](browser, auth_text)
             else:
                 LOGGER.info(
                         '"%s": Invalid login method "%s"',
@@ -132,7 +129,7 @@ class AuthenticationHandler:
                         '"%s": "value": %s, "expiry": %s',
                         self.username, value, expiry
                     )
-                cookie = self.create_cookie(
+                cookie = CookieStorage.create_cookie(
                         'PHPSESSID',
                         expiry,
                         value
@@ -152,7 +149,7 @@ class AuthenticationHandler:
                     expiry = browser_cookie.get('expiry', None)
                     value = browser_cookie.get('value', None)
                     cookies.append(
-                        self.create_cookie(
+                        CookieStorage.create_cookie(
                             cookie_name,
                             expiry,
                             value
@@ -250,17 +247,6 @@ class AuthenticationHandler:
         browser.click(css_selector='.sa_sn.imp.float_left')
         return browser
 
-    @staticmethod
-    def create_cookie(name, expiry, value):
-        """Create cookie"""
-        return {
-            'domain': 'rivalregions.com',
-            'name': name,
-            'path': '/',
-            'secure': False,
-            'expires': expiry,
-            'value': value,
-        }
 
     @session_handler
     def get(self, path, add_var_c=False):
@@ -382,7 +368,7 @@ class AuthenticationHandler:
             browser.go_to('https://rivalregions.com/')
             for cookie_name, value in self.session.cookies.get_dict().items():
                 browser.add_cookie(
-                    self.create_cookie(cookie_name, None, value)
+                    CookieStorage.create_cookie(cookie_name, None, value)
                 )
             browser.go_to(
                     'https://rivalregions.com/#slide/conference/{}'
