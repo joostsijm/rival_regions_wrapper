@@ -4,7 +4,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from rival_regions_wrapper import data_structures
+from rival_regions_wrapper import util
 
 from .abstract_wrapper import AbstractWrapper
 
@@ -13,8 +13,8 @@ class Market(AbstractWrapper):
     """Wrapper class for profile"""
     def info(self, resource):
         """Get profile"""
-        if isinstance(resource, str) and resource in data_structures.ITEM_KEYS:
-            resource = data_structures.ITEM_KEYS[resource]
+        if isinstance(resource, str) and resource in util.ITEM_KEYS:
+            resource = util.ITEM_KEYS[resource]
         path = 'storage/listed/{}'.format(resource)
         response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')

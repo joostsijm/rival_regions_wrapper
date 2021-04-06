@@ -4,7 +4,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from rival_regions_wrapper import functions
+from rival_regions_wrapper import util
 from .abstract_wrapper import AbstractWrapper
 
 
@@ -31,7 +31,7 @@ class Perks(AbstractWrapper):
                         r'^.*:\s', '',
                         soup.select_one('.perk_source_4 .small').text
                     )
-                upgrade_date = functions.parse_date(date_string)
+                upgrade_date = util.parse_date(date_string)
                 break
         perks = {
             'strenght': int(

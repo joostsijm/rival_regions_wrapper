@@ -4,7 +4,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from rival_regions_wrapper import data_structures
+from rival_regions_wrapper import util
 
 from .abstract_wrapper import AbstractWrapper
 
@@ -13,8 +13,8 @@ class Craft(AbstractWrapper):
     """Wrapper class for crafting"""
     def info(self, item):
         """Get craft"""
-        if isinstance(item, str) and item in data_structures.ITEM_KEYS:
-            item = data_structures.ITEM_KEYS[item]
+        if isinstance(item, str) and item in util.ITEM_KEYS:
+            item = util.ITEM_KEYS[item]
         path = 'storage/produce/{}'.format(item)
         response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
@@ -46,7 +46,7 @@ class Craft(AbstractWrapper):
 
     def produce(self, item, amount):
         """Craft item"""
-        if isinstance(item, str) and item in data_structures.ITEM_KEYS:
-            item = data_structures.ITEM_KEYS[item]
+        if isinstance(item, str) and item in util.ITEM_KEYS:
+            item = util.ITEM_KEYS[item]
         self.api_wrapper.post('storage/newproduce/{}/{}'.format(item, amount))
         return True

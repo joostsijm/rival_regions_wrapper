@@ -5,7 +5,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from rival_regions_wrapper import functions
+from rival_regions_wrapper import util
 
 from .abstract_wrapper import AbstractWrapper
 
@@ -62,5 +62,5 @@ class Article(AbstractWrapper):
 
         date_element = soup.select_one('.news_conent_title')
         date_string = date_element.text.replace('✘', '').strip()
-        article_info['post_date'] = functions.parse_date(date_string)
+        article_info['post_date'] = util.parse_date(date_string)
         return article_info

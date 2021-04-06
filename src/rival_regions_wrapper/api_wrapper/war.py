@@ -6,7 +6,7 @@ import unicodedata
 
 from bs4 import BeautifulSoup
 
-from rival_regions_wrapper import functions
+from rival_regions_wrapper import util
 from .abstract_wrapper import AbstractWrapper
 
 
@@ -79,7 +79,7 @@ class War(AbstractWrapper):
                 )
             if results:
                 war_info['finish_date'] = \
-                    functions.parse_date(results.group(0))
+                    util.parse_date(results.group(0))
 
         war_info['war_units'] = {}
         for war_unit in soup.select('.war_w_unit_div'):
