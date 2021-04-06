@@ -4,11 +4,13 @@ import re
 
 from bs4 import BeautifulSoup
 
+from .abstract_wrapper import AbstractWrapper
 
-class ResourceState():
+
+class ResourceState(AbstractWrapper):
     """Wrapper class for resource state"""
     def __init__(self, api_wrapper, state_id):
-        self.api_wrapper = api_wrapper
+        AbstractWrapper.__init__(self, api_wrapper)
         self.state_id = state_id
 
     def info(self, resource):

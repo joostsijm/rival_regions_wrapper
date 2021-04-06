@@ -4,11 +4,13 @@ import re
 
 from bs4 import BeautifulSoup
 
+from .abstract_wrapper import AbstractWrapper
 
-class Profile():
+
+class Profile(AbstractWrapper):
     """Wrapper class for profile"""
     def __init__(self, api_wrapper, profile_id):
-        self.api_wrapper = api_wrapper
+        AbstractWrapper.__init__(self, api_wrapper)
         self.profile_id = profile_id
 
     def info(self):

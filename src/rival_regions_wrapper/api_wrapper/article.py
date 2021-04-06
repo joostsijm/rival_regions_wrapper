@@ -7,12 +7,11 @@ from bs4 import BeautifulSoup
 
 from rival_regions_wrapper import functions
 
+from .abstract_wrapper import AbstractWrapper
 
-class Article():
+
+class Article(AbstractWrapper):
     """Wrapper class for article"""
-    def __init__(self, api_wrapper):
-        self.api_wrapper = api_wrapper
-
     def info(self, article_id):
         """Get artcile"""
         path = 'news/show/{}'.format(article_id)

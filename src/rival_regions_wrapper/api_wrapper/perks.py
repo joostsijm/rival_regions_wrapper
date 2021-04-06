@@ -5,18 +5,21 @@ import re
 from bs4 import BeautifulSoup
 
 from rival_regions_wrapper import functions
+from .abstract_wrapper import AbstractWrapper
 
 
-class Perks():
+class Perks(AbstractWrapper):
     """Wrapper class for perks"""
-    def __init__(self, api_wrapper):
-        self.api_wrapper = api_wrapper
-
     def info(self):
         """Get perks"""
         path = 'main/content'
         response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
+        return self.info_parse(soup)
+
+    @staticmethod
+    def info_parse(soup):
+        """Parse perk info"""
         perks = soup.select('.perk_source_4')
         upgrade_perk = None
         upgrade_date = None

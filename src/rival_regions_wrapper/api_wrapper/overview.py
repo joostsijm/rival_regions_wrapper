@@ -1,54 +1,26 @@
 """Profile class"""
 
-import re
-
 from bs4 import BeautifulSoup
 
-from rival_regions_wrapper import functions
+from .abstract_wrapper import AbstractWrapper
+from .perks import Perks
 
 
-class Overview():
+class Overview(AbstractWrapper):
     """Wrapper class for perks"""
-    def __init__(self, api_wrapper):
-        self.api_wrapper = api_wrapper
-
     def info(self):
-        """Get perks"""
+        """Get overview """
         path = 'main/content'
         response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
-        perks = soup.select('.perk_source_4')
-        upgrade_perk = None
-        upgrade_date = None
-        for perk in perks:
-            date_string = perk.select_one('.small')
-            if date_string:
-                upgrade_perk = int(perk['perk'])
-                date_string = re.sub(
-                        r'^.*:\s', '',
-                        soup.select_one('.perk_source_4 .small').text
-                    )
-                upgrade_date = functions.parse_date(date_string)
-                break
+        perks = Perks.info_parse(soup)
         auto_war = soup.select_one('.war_index_war span.pointer:nth-child(4)')
         if auto_war and auto_war.has_attr('action'):
             auto_war = auto_war['action'].replace('war/details/', '')
         else:
             auto_war = None
         overview = {
-            'perks': {
-                'strenght': int(soup.find(
-                    'div', {'perk': 1, 'class': 'perk_source_2'}).text
-                ),
-                'education': int(soup.find(
-                    'div', {'perk': 2, 'class': 'perk_source_2'}).text
-                ),
-                'endurance': int(soup.find(
-                    'div', {'perk': 3, 'class': 'perk_source_2'}).text
-                ),
-                'upgrade_date': upgrade_date,
-                'upgrade_perk': upgrade_perk
-            },
+            'perks': perks,
             'war': {
                 'auto_war': auto_war,
             }

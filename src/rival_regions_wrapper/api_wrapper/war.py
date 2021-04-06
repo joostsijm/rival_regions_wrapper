@@ -7,13 +7,11 @@ import unicodedata
 from bs4 import BeautifulSoup
 
 from rival_regions_wrapper import functions
+from .abstract_wrapper import AbstractWrapper
 
 
-class War():
+class War(AbstractWrapper):
     """Wrapper class for war"""
-    def __init__(self, api_wrapper):
-        self.api_wrapper = api_wrapper
-
     def page(self):
         """Get training war"""
         path = 'war'

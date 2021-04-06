@@ -4,39 +4,17 @@ import re
 
 from bs4 import BeautifulSoup
 
+from rival_regions_wrapper import data_structures
 
-KEYS = {
-    'oil': 3,
-    'ore': 4,
-    'uranium': 11,
-    'diamonds': 15,
-    'liquid_oxygen': 21,
-    'helium-3': 24,
-    'rivalium': 26,
-    'antirad': 13,
-    'energy_drink': 17,
-    'spacerockets': 20,
-    'lss': 25,
-    'tanks': 2,
-    'aircrafts': 1,
-    'missiles': 14,
-    'bombers': 16,
-    'battleships': 18,
-    'laser_drones': 27,
-    'moon_tanks': 22,
-    'space_stations': 23
-}
+from .abstract_wrapper import AbstractWrapper
 
 
-class Craft():
+class Craft(AbstractWrapper):
     """Wrapper class for crafting"""
-    def __init__(self, api_wrapper):
-        self.api_wrapper = api_wrapper
-
     def info(self, item):
         """Get craft"""
-        if isinstance(item, str) and item in KEYS:
-            item = KEYS[item]
+        if isinstance(item, str) and item in data_structures.ITEM_KEYS:
+            item = data_structures.ITEM_KEYS[item]
         path = 'storage/produce/{}'.format(item)
         response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
@@ -68,7 +46,7 @@ class Craft():
 
     def produce(self, item, amount):
         """Craft item"""
-        if isinstance(item, str) and item in KEYS:
-            item = KEYS[item]
+        if isinstance(item, str) and item in data_structures.ITEM_KEYS:
+            item = data_structures.ITEM_KEYS[item]
         self.api_wrapper.post('storage/newproduce/{}/{}'.format(item, amount))
         return True

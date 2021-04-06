@@ -1,11 +1,10 @@
 """Conference class"""
 
+from .abstract_wrapper import AbstractWrapper
 
-class Conference():
+
+class Conference(AbstractWrapper):
     """Wrapper class for confernce"""
-    def __init__(self, api_wrapper):
-        self.api_wrapper = api_wrapper
-
     def send_message(self, conference_id, message):
         """send conference message"""
         self.api_wrapper.send_conference_message(conference_id, message)
