@@ -210,7 +210,9 @@ class AuthenticationHandler:
         time.sleep(1)
         browser.go_to(auth_text2[0])
         time.sleep(1)
-        browser.click(css_selector="#sa_add2 > div:nth-child(4) > a.sa_link.gogo > div")
+        browser.click(
+            css_selector="#sa_add2 > div:nth-child(4) > a.sa_link.gogo > div"
+        )
         time.sleep(3)
         return browser
 
@@ -246,7 +248,6 @@ class AuthenticationHandler:
         time.sleep(5)
         browser.click(css_selector='.sa_sn.imp.float_left')
         return browser
-
 
     @session_handler
     def get(self, path, add_var_c=False):
