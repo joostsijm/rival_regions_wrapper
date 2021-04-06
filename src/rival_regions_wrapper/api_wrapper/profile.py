@@ -22,9 +22,11 @@ class Profile():
             'profile_id': self.profile_id,
             'name': re.sub(r'.*:\s', '', soup.find('h1').text),
             'level': int(re.sub(r'^Level\:\s|\s\(.*\)$', '', level)),
-            'level_percentage': int(re.sub(r'^Level\:\s(\d+)\s\(|\s\%\)$', '', level)),
+            'level_percentage': int(
+                re.sub(r'^Level\:\s(\d+)\s\(|\s\%\)$', '', level)
+            ),
             'strenght': int(perks[0].text),
             'education': int(perks[1].text),
-            'endurance': int(perks[2].text)
+            'endurance': int(perks[2].text),
         }
         return profile

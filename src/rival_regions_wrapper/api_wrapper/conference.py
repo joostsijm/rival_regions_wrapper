@@ -1,7 +1,5 @@
 """Conference class"""
 
-from rival_regions_wrapper import functions
-
 
 class Conference():
     """Wrapper class for confernce"""

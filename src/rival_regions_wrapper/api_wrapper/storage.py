@@ -37,10 +37,10 @@ class Storage():
         storage = {}
         for key, item_id in keys.items():
             storage[key] = int(
-                soup.find('span', {'urlbar' : item_id}).text.replace('.', '')
+                soup.find('span', {'urlbar': item_id}).text.replace('.', '')
             )
             storage['{}_max'.format(key)] = int(
-                soup.find('span', {'urlbar' : item_id})['maxstore']
+                soup.find('span', {'urlbar': item_id})['maxstore']
             )
 
         return storage

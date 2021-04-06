@@ -33,7 +33,9 @@ class Article():
 
         article_info = {
             'article_id': article_id,
-            'article_title': unicodedata.normalize("NFKD", soup.select_one('.title_totr').text),
+            'article_title': unicodedata.normalize(
+                "NFKD", soup.select_one('.title_totr').text
+            ),
             'author_name': re.sub(r',\s\skarma.*$', '', author.text),
             'author_id': int(author['action'].replace('slide/profile/', '')),
             'region_name': region.text,
@@ -45,7 +47,9 @@ class Article():
         }
 
         if newspaper:
-            article_info['newspaper_id'] = int(newspaper['action'].replace('newspaper/show/', ''))
+            article_info['newspaper_id'] = int(
+                    newspaper['action'].replace('newspaper/show/', '')
+                )
             article_info['newspaper_name'] = newspaper.text
         else:
             article_info['newspaper_id'] = None

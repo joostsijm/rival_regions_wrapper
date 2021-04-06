@@ -12,4 +12,4 @@ from .overview import Overview
 from .war import War
 from .work import Work
 from .article import Article
-from .conference import Conference 
+from .conference import Conference

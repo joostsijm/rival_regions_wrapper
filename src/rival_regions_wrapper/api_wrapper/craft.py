@@ -1,8 +1,31 @@
-"""CRAFT class"""
+"""Craft class"""
 
 import re
 
 from bs4 import BeautifulSoup
+
+
+KEYS = {
+    'oil': 3,
+    'ore': 4,
+    'uranium': 11,
+    'diamonds': 15,
+    'liquid_oxygen': 21,
+    'helium-3': 24,
+    'rivalium': 26,
+    'antirad': 13,
+    'energy_drink': 17,
+    'spacerockets': 20,
+    'lss': 25,
+    'tanks': 2,
+    'aircrafts': 1,
+    'missiles': 14,
+    'bombers': 16,
+    'battleships': 18,
+    'laser_drones': 27,
+    'moon_tanks': 22,
+    'space_stations': 23
+}
 
 
 class Craft():
@@ -12,29 +35,8 @@ class Craft():
 
     def info(self, item):
         """Get craft"""
-        keys = {
-            'oil': 3,
-            'ore': 4,
-            'uranium': 11,
-            'diamonds': 15,
-            'liquid_oxygen': 21,
-            'helium-3': 24,
-            'rivalium': 26,
-            'antirad': 13,
-            'energy_drink': 17,
-            'spacerockets': 20,
-            'lss': 25,
-            'tanks': 2,
-            'aircrafts': 1,
-            'missiles': 14,
-            'bombers': 16,
-            'battleships': 18,
-            'laser_drones': 27,
-            'moon_tanks': 22,
-            'space_stations': 23
-        }
-        if isinstance(item, str) and item in keys:
-            item = keys[item]
+        if isinstance(item, str) and item in KEYS:
+            item = KEYS[item]
         path = 'storage/produce/{}'.format(item)
         response = self.api_wrapper.get(path)
         soup = BeautifulSoup(response, 'html.parser')
@@ -49,41 +51,24 @@ class Craft():
         }
         resource_cost = {}
         for name, selector in resource_dict.items():
-            element = resources.select_one('.{} .produce_discount'.format(selector))
+            element = resources.select_one(
+                    '.{} .produce_discount'.format(selector)
+                )
             if element:
                 resource_cost[name] = int(
                     re.sub(r'-|\.', '', element.text)
                 )
         craft = {
-            'market_price': int(re.sub(r'\.|\s\$', '', soup.select('.small .imp')[1].text)),
+            'market_price': int(
+                re.sub(r'\.|\s\$', '', soup.select('.small .imp')[1].text)
+            ),
             'resources': resource_cost
         }
         return craft
 
     def produce(self, item, amount):
         """Craft item"""
-        keys = {
-            'oil': 3,
-            'ore': 4,
-            'uranium': 11,
-            'diamonds': 15,
-            'liquid_oxygen': 21,
-            'helium-3': 24,
-            'rivalium': 26,
-            'antirad': 13,
-            'energy_drink': 17,
-            'spacerockets': 20,
-            'lss': 25,
-            'tanks': 2,
-            'aircrafts': 1,
-            'missiles': 14,
-            'bombers': 16,
-            'battleships': 18,
-            'laser_drones': 27,
-            'moon_tanks': 22,
-            'space_stations': 23
-        }
-        if isinstance(item, str) and item in keys:
-            item = keys[item]
+        if isinstance(item, str) and item in KEYS:
+            item = KEYS[item]
         self.api_wrapper.post('storage/newproduce/{}/{}'.format(item, amount))
         return True

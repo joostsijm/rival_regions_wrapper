@@ -43,11 +43,17 @@ class Market():
         offers = []
         for offer_tree in offers_tree:
             offers.append({
-                'player_id': int(
-                    re.sub(r'^.*\/', '', offer_tree.select_one('.results_date')['action'])
+                'player_id': int(re.sub(
+                        r'^.*\/', '',
+                        offer_tree.select_one('.results_date')['action']
+                    )
                 ),
                 'player_name': offer_tree.select_one('.results_date').string,
-                'price': int(float(offer_tree.select('.list_level')[1]['rat'])*100),
-                'amount': int(offer_tree.select_one('.list_level.imp.small')['rat']),
+                'price': int(
+                    float(offer_tree.select('.list_level')[1]['rat'])*100
+                ),
+                'amount': int(
+                    offer_tree.select_one('.list_level.imp.small')['rat']
+                ),
             })
         return offers

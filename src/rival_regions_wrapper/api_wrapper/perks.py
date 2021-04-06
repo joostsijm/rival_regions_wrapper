@@ -24,13 +24,22 @@ class Perks():
             date_string = perk.select_one('.small')
             if date_string:
                 upgrade_perk = int(perk['perk'])
-                date_string = re.sub(r'^.*:\s', '', soup.select_one('.perk_source_4 .small').text)
+                date_string = re.sub(
+                        r'^.*:\s', '',
+                        soup.select_one('.perk_source_4 .small').text
+                    )
                 upgrade_date = functions.parse_date(date_string)
                 break
         perks = {
-            'strenght': int(soup.find('div', {'perk': 1, 'class': 'perk_source_2'}).text),
-            'education': int(soup.find('div', {'perk': 2, 'class': 'perk_source_2'}).text),
-            'endurance': int(soup.find('div', {'perk': 3, 'class': 'perk_source_2'}).text),
+            'strenght': int(
+                soup.find('div', {'perk': 1, 'class': 'perk_source_2'}).text
+            ),
+            'education': int(
+                soup.find('div', {'perk': 2, 'class': 'perk_source_2'}).text
+            ),
+            'endurance': int(
+                soup.find('div', {'perk': 3, 'class': 'perk_source_2'}).text
+            ),
             'upgrade_date': upgrade_date,
             'upgrade_perk': upgrade_perk
         }
