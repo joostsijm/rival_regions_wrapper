@@ -324,7 +324,7 @@ def test_article_info_two(api_wrapper, article_keys):
     assert isinstance(response['comments'], int), "Comments should be an integer"
     assert isinstance(response['post_date'], datetime), "Post date should be a datetime"
 
-# @pytest.mark.skip(reason="message request")
+@pytest.mark.skip(reason="message request")
 def test_conference_message(api_wrapper):
     """Test conference message"""
     conference_id = 439289
