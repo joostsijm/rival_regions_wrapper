@@ -4,12 +4,11 @@ Authentication handeler module
 
 import sys
 import re
-import time
 
 import requests
 import cfscrape
 
-from rival_regions_wrapper import LOGGER
+from rival_regions_wrapper import LOGGER, login_methods
 from rival_regions_wrapper.cookie_handler import CookieHandler
 from rival_regions_wrapper.browser import Browser
 
@@ -98,20 +97,22 @@ class AuthenticationHandler:
                     self.username, self.login_method
                 )
 
-            login_methods = {
-                'g': self.login_google,
-                'google': self.login_google,
-                'v': self.login_vk,
-                'vk': self.login_vk,
-                'f': self.login_facebook,
-                'facebook': self.login_facebook,
+            login_method_dict = {
+                'g': login_methods.login_google,
+                'google': login_methods.login_google,
+                'v': login_methods.login_vk,
+                'vk': login_methods.login_vk,
+                'f': login_methods.login_facebook,
+                'facebook': login_methods.login_facebook,
             }
 
             auth_text = requests.get("https://rivalregions.com").text
             browser = Browser(showWindow=self.show_window)
 
-            if self.login_method in login_methods:
-                browser = login_methods[self.login_method](browser, auth_text)
+            if self.login_method in login_method_dict:
+                browser = login_method_dict[self.login_method](
+                        browser, auth_text, self.username, self.password
+                    )
             else:
                 LOGGER.info(
                         '"%s": Invalid login method "%s"',
@@ -179,74 +180,6 @@ class AuthenticationHandler:
                 var_c = line.split("'")[-2]
                 LOGGER.debug('"%s": got var_c: %s', self.username, var_c)
                 self.var_c = line.split("'")[-2]
-
-    # This is working
-    def login_google(self, browser, auth_text):
-        """login using Google"""
-        LOGGER.info('"%s": Login method Google', self.username)
-        auth_text1 = auth_text.split('\t<a href="')
-        auth_text2 = auth_text1[1].split('" class="sa')
-        time.sleep(1)
-        browser.go_to(auth_text2[0])
-
-        LOGGER.info('"%s": Typing in username', self.username)
-        browser.type(self.username, into='Email')
-
-        LOGGER.info('"%s": pressing next button', self.username)
-        browser.click(css_selector="#next")
-        time.sleep(2)
-
-        LOGGER.info('"%s": Typing in password', self.username)
-        browser.type(self.password, css_selector="input")
-
-        LOGGER.info('"%s": pressing sign in button', self.username)
-        browser.click(css_selector="#submit")
-        time.sleep(3)
-
-        # Some why it wont click and login immediately. This seems to work
-        time.sleep(1)
-        browser.go_to(auth_text2[0])
-        time.sleep(1)
-        browser.go_to(auth_text2[0])
-        time.sleep(1)
-        browser.click(
-            css_selector="#sa_add2 > div:nth-child(4) > a.sa_link.gogo > div"
-        )
-        time.sleep(3)
-        return browser
-
-    # IDK if this is working
-    def login_vk(self, browser, auth_text):
-        """login using VK"""
-        LOGGER.info('Login method VK')
-        auth_text1 = auth_text.split("(\'.vkvk\').attr(\'url\', \'")
-        auth_text2 = auth_text1[1].split('&response')
-
-        browser.go_to(auth_text2[0])
-        browser.type(self.username, into='email')
-        browser.type(
-                self.password,
-                xpath="/html/body/div/div/div/div[2]/form/div/div/input[7]"
-        )
-        browser.click('Log in')
-        return browser
-
-    # IDK if this is working
-    def login_facebook(self, browser, auth_text):
-        """login using Facebook"""
-        LOGGER.info('Login method Facebook')
-        auth_text1 = \
-            auth_text.split('">\r\n\t\t\t\t<div class="sa_sn imp float_left" ')
-        auth_text2 = auth_text1[0].split('200px;"><a class="sa_link" href="')
-        url = auth_text2[1]
-
-        browser.go_to(url)
-        browser.type(self.username, into='Email')
-        browser.type(self.password, into='Password')
-        browser.click('Log In')
-        time.sleep(5)
-        browser.click(css_selector='.sa_sn.imp.float_left')
-        return browser
 
     @session_handler
     def get(self, path, add_var_c=False):
