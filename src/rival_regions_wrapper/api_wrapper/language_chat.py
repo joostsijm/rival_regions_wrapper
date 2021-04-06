@@ -1,7 +1,5 @@
 """Language chat class"""
 
-import time
-
 from rival_regions_wrapper import authentication_handler, LOGGER
 from rival_regions_wrapper.api_wrapper.abstract_wrapper import AbstractWrapper
 
@@ -22,13 +20,11 @@ class LanguageChat(AbstractWrapper):
         browser = self.api_wrapper.client.get_browser()
         try:
             browser.go_to(
-                    'https://rivalregions.com/#slide/chat/lang_{}'
-                    .format(self.language)
+                    'https://rivalregions.com/#slide/chat/lang_{}'.format(
+                            self.language
+                        )
                 )
-            browser.refresh()
-            time.sleep(2)
-            browser.type(message, id='message')
-            browser.click(id='chat_send')
+            self.api_wrapper.client.send_chat(browser, message)
             LOGGER.info(
                     '"%s": CHAT: language %s, finished sending message',
                     self.api_wrapper.client.username, self.language

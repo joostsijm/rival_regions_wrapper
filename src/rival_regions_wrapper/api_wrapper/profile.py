@@ -1,6 +1,5 @@
 """Profile class"""
 
-import time
 import re
 
 from bs4 import BeautifulSoup
@@ -45,13 +44,11 @@ class Profile(AbstractWrapper):
         browser = self.api_wrapper.client.get_browser()
         try:
             browser.go_to(
-                    'https://rivalregions.com/#messages/{}'
-                    .format(self.profile_id)
+                    'https://rivalregions.com/#messages/{}'.format(
+                            self.profile_id
+                        )
                 )
-            browser.refresh()
-            time.sleep(2)
-            browser.type(message, id='message')
-            browser.click(id='chat_send')
+            self.api_wrapper.client.send_chat(browser, message)
             LOGGER.info(
                     '"%s:" PM: user id %s, finished sending message',
                     self.api_wrapper.client.username, self.profile_id

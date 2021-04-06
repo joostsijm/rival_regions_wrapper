@@ -2,6 +2,8 @@
 Authentication handeler module
 """
 
+import time
+
 import sys
 import re
 
@@ -241,6 +243,14 @@ class AuthenticationHandler:
                     CookieHandler.create_cookie(cookie_name, None, value)
                 )
         return browser
+
+    @classmethod
+    def send_chat(cls, browser, message):
+        """Send message"""
+        browser.refresh()
+        time.sleep(2)
+        browser.type(message, id='message')
+        browser.click(id='chat_send')
 
     @classmethod
     def check_response(cls, response):
