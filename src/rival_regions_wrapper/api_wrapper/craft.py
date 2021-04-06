@@ -5,8 +5,7 @@ import re
 from bs4 import BeautifulSoup
 
 from rival_regions_wrapper import util
-
-from .abstract_wrapper import AbstractWrapper
+from rival_regions_wrapper.api_wrapper.abstract_wrapper import AbstractWrapper
 
 
 class Craft(AbstractWrapper):

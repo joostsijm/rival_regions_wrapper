@@ -224,6 +224,24 @@ class AuthenticationHandler:
             raise NoLogginException()
         return response.text
 
+    def get_browser(self):
+        """Get browser"""
+        if not self.session:
+            raise NoLogginException()
+
+        response = self.session.get(
+                "https://rivalregions.com/#overview"
+            )
+        self.check_response(response)
+        browser = Browser(showWindow=self.show_window)
+        browser.go_to('https://rivalregions.com/')
+        for cookie_name, value in \
+                self.session.cookies.get_dict().items():
+            browser.add_cookie(
+                    CookieHandler.create_cookie(cookie_name, None, value)
+                )
+        return browser
+
     @classmethod
     def check_response(cls, response):
         """Check resonse for authentication"""
