@@ -15,6 +15,16 @@ from .cookie_storage import CookieStorage
 from .browser import StealthBrowser as Browser
 
 
+LOGIN_METHODS = {
+    'g': self.login_google,
+    'google': self.login_google,
+    'v': self.login_vk,
+    'vk': self.login_vk,
+    'f': self.login_facebook,
+    'facebook': self.login_facebook,
+}
+
+
 class RRClientException(Exception):
     """RR exception"""
     def __init__(self, *args, **kwargs):
@@ -87,32 +97,25 @@ class AuthenticationHandler:
 
     def login(self):
         """Login user if needed"""
-        LOGGER.info('"%s": start login, method: "%s"',
-                    self.username, self.login_method)
+        LOGGER.info(
+                '"%s": start login, method: "%s"',
+                self.username, self.login_method
+            )
         cookies = CookieStorage.get_cookies(self.username)
         if not cookies:
             cookies = []
-            LOGGER.info('"%s": no cookie, new login, method "%s"',
-                        self.username, self.login_method)
-            if self.login_method not in [
-                        "g", "google", "v", "vk", "f", "facebook"
-                    ]:
+            LOGGER.info(
+                    '"%s": no cookie, new login, method "%s"',
+                    self.username, self.login_method
+                )
+            if self.login_method not in LOGIN_METHODS:
                 raise RRClientException("Not a valid login method.")
 
             auth_text = requests.get("https://rivalregions.com").text
             browser = Browser(showWindow=self.show_window)
 
-            method_dict = {
-                'g': self.login_google,
-                'google': self.login_google,
-                'v': self.login_vk,
-                'vk': self.login_vk,
-                'f': self.login_facebook,
-                'facebook': self.login_facebook,
-            }
-
-            if self.login_method in method_dict:
-                browser = method_dict[self.login_method](browser, auth_text)
+            if self.login_method in LOGIN_METHODS:
+                browser = LOGIN_METHODS[self.login_method](browser, auth_text)
             else:
                 LOGGER.info(
                         '"%s": Invalid login method "%s"',
@@ -125,7 +128,8 @@ class AuthenticationHandler:
             if browser_cookie:
                 expiry = browser_cookie.get('expiry', None)
                 value = browser_cookie.get('value', None)
-                LOGGER.info('"%s": "value": %s, "expiry": {}',
+                LOGGER.info(
+                        '"%s": "value": %s, "expiry": %s',
                         self.username, value, expiry
                     )
                 cookie = self.create_cookie(
@@ -141,9 +145,10 @@ class AuthenticationHandler:
             for cookie_name in cookie_names:
                 browser_cookie = browser.get_cookie(cookie_name)
                 if browser_cookie:
-                    LOGGER.info('"{}": Get {}'.format(
+                    LOGGER.info(
+                        '"%s": Get %s',
                         self.username, cookie_name
-                    ))
+                    )
                     expiry = browser_cookie.get('expiry', None)
                     value = browser_cookie.get('value', None)
                     cookies.append(
@@ -153,9 +158,10 @@ class AuthenticationHandler:
                             value
                         )
                     )
-                    LOGGER.info('"{}": "value": {}, "expiry": {}'.format(
+                    LOGGER.info(
+                            '"%s": "value": %s, "expiry": %s',
                             self.username, value, expiry
-                        ))
+                        )
                 else:
                     raise NoCookieException()
 
