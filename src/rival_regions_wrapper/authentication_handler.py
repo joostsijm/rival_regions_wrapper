@@ -1,47 +1,18 @@
-
 """
-Client module
+Authentication handeler module
 """
 
 import sys
-import logging
 import re
 import time
-from datetime import datetime
-import json
-import pathlib2
 
 import requests
 import cfscrape
+
+from rival_regions_wrapper import LOGGER
+
+from .cookie_storage import CookieStorage
 from .browser import StealthBrowser as Browser
-from appdirs import user_data_dir
-
-
-DATA_DIR = user_data_dir('rival_regions_wrapper', 'bergc')
-pathlib2.Path(DATA_DIR).mkdir(parents=True, exist_ok=True)
-
-# get logger
-LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.DEBUG)
-
-# create file handler
-FILE_HANDLER = logging.FileHandler('{}/output.log'.format(DATA_DIR))
-FILE_HANDLER.setLevel(logging.DEBUG)
-
-# create console handler
-STREAM_HANDLER = logging.StreamHandler()
-STREAM_HANDLER.setLevel(logging.INFO)
-
-# create formatter and add it to the handlers
-STREAM_FORMATTER = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-STREAM_HANDLER.setFormatter(STREAM_FORMATTER)
-FILE_FORMATTER = logging \
-        .Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-FILE_HANDLER.setFormatter(FILE_FORMATTER)
-
-# add the handlers to logger
-LOGGER.addHandler(STREAM_HANDLER)
-LOGGER.addHandler(FILE_HANDLER)
 
 
 class RRClientException(Exception):
@@ -82,7 +53,7 @@ def session_handler(func):
         try:
             return func(*args, **kwargs)
         except (SessionExpireException, ConnectionError, ConnectionResetError):
-            instance.remove_cookie(instance.username)
+            CookieStorage.remove_cookie(instance.username)
             instance.login()
             return try_run(instance, func, *args, **kwargs)
         except NoLogginException:
@@ -103,7 +74,6 @@ class AuthenticationHandler:
 
     def __init__(self, show_window=False):
         self.show_window = show_window
-        self.LOGGER = LOGGER
         LOGGER.info('Initialize authentication handler, show window: "%s"',
                     self.show_window)
 
@@ -119,7 +89,7 @@ class AuthenticationHandler:
         """Login user if needed"""
         LOGGER.info('"%s": start login, method: "%s"',
                     self.username, self.login_method)
-        cookies = self.get_cookies(self.username)
+        cookies = CookieStorage.get_cookies(self.username)
         if not cookies:
             cookies = []
             LOGGER.info('"%s": no cookie, new login, method "%s"',
@@ -155,9 +125,9 @@ class AuthenticationHandler:
             if browser_cookie:
                 expiry = browser_cookie.get('expiry', None)
                 value = browser_cookie.get('value', None)
-                LOGGER.info('"{}": "value": {}, "expiry": {}'.format(
+                LOGGER.info('"%s": "value": %s, "expiry": {}',
                         self.username, value, expiry
-                    ))
+                    )
                 cookie = self.create_cookie(
                         'PHPSESSID',
                         expiry,
@@ -166,8 +136,6 @@ class AuthenticationHandler:
                 cookies.append(cookie)
             else:
                 raise NoCookieException()
-
-            # TODO: what's up with 'rival/googles'
 
             cookie_names = ['rr_f']
             for cookie_name in cookie_names:
@@ -191,7 +159,7 @@ class AuthenticationHandler:
                 else:
                     raise NoCookieException()
 
-            self.write_cookies(self.username, cookies)
+            CookieStorage.write_cookies(self.username, cookies)
             LOGGER.debug('"%s": closing login tab', self.username)
             browser.close_current_tab()
         else:
@@ -276,73 +244,6 @@ class AuthenticationHandler:
         browser.click(css_selector='.sa_sn.imp.float_left')
         return browser
 
-    @classmethod
-    def write_cookies(cls, username, passed_cookies):
-        """Write cookie to file"""
-        LOGGER.info('"%s": Saving cookie', username)
-        cookies = None
-        try:
-            with open('{}/cookies.json'.format(DATA_DIR), 'r') as cookies_file:
-                cookies = json.load(cookies_file)
-            if not cookies:
-                raise FileNotFoundError # raise error as if file hadn't been found
-        except FileNotFoundError:
-            cookies = {username : {}}
-        if username not in cookies:
-            cookies[username] = {}
-        for cookie in passed_cookies:
-            cookies[username][cookie['name']] = {
-                'expiry': cookie['expires'],
-                'value': cookie['value'],
-            }
-
-        with open('{}/cookies.json'.format(DATA_DIR), 'w+') as cookies_file:
-            json.dump(cookies, cookies_file)
-        LOGGER.info('"%s": Saved cookie', username)
-
-    @classmethod
-    def get_cookies(cls, username):
-        """Read cookies for username"""
-        LOGGER.info('"%s": Reading cookie', username)
-        cookies = []
-        try:
-            with open('{}/cookies.json'.format(DATA_DIR), 'r') as cookies_file:
-                cookies_data = json.load(cookies_file)
-                for cookie_username, user_cookies in cookies_data.items():
-                    if cookie_username == username:
-                        LOGGER.info('"%s": Found cookies', username)
-                        for cookie_name, cookie in user_cookies.items():
-                            expires = datetime.fromtimestamp(
-                                    int(cookie['expiry'])
-                                )
-                            if datetime.now() >= expires:
-                                LOGGER.info('"%s": Cookie is expired', username)
-                                return None
-                            cookies.append(cls.create_cookie(
-                                cookie_name,
-                                cookie['expiry'],
-                                cookie['value'],
-                            ))
-                        return cookies
-        except FileNotFoundError:
-            pass
-        return cookies
-
-    @classmethod
-    def remove_cookie(cls, username):
-        """Remove cookie from storage"""
-        LOGGER.info('"%s": Removing cookie', username)
-        cookies = None
-        try:
-            with open('{}/cookies.json'.format(DATA_DIR), 'r') as cookies_file:
-                cookies = json.load(cookies_file)
-        except FileNotFoundError:
-            cookies = {}
-        cookies.pop(username, None)
-        with open('{}/cookies.json'.format(DATA_DIR), 'w+') as cookies_file:
-            json.dump(cookies, cookies_file)
-        LOGGER.info('"%s": Removed cookie', username)
-
     @staticmethod
     def create_cookie(name, expiry, value):
         """Create cookie"""
@@ -416,7 +317,7 @@ class AuthenticationHandler:
                 raise SessionExpireException()
             browser = Browser(showWindow=self.show_window)
             browser.go_to('https://rivalregions.com/')
-            for cookie in self.get_cookies(self.username):
+            for cookie in CookieStorage.get_cookies(self.username):
                 browser.add_cookie(cookie)
             browser.go_to(
                     'https://rivalregions.com/#slide/chat/lang_{}'
@@ -444,7 +345,7 @@ class AuthenticationHandler:
                 raise SessionExpireException()
             browser = Browser(showWindow=self.show_window)
             browser.go_to('https://rivalregions.com/')
-            for cookie in self.get_cookies(self.username):
+            for cookie in CookieStorage.get_cookies(self.username):
                 browser.add_cookie(cookie)
             browser.go_to(
                     'https://rivalregions.com/#messages/{}'.format(user_id)
