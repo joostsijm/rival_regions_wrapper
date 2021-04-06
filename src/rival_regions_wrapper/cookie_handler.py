@@ -5,9 +5,11 @@ Store and retrieve cookies
 from datetime import datetime
 import json
 
+from rival_regions_wrapper import LOGGER, DATA_DIR
 
-class CookieStorage():
-    """Cookie storage class"""
+
+class CookieHandler():
+    """Cookie handler class"""
     @classmethod
     def write_cookies(cls, username, passed_cookies):
         """Write cookie to file"""
@@ -17,9 +19,9 @@ class CookieStorage():
             with open('{}/cookies.json'.format(DATA_DIR), 'r') as cookies_file:
                 cookies = json.load(cookies_file)
             if not cookies:
-                raise FileNotFoundError # raise error as if file hadn't been found
+                raise FileNotFoundError
         except FileNotFoundError:
-            cookies = {username : {}}
+            cookies = {username: {}}
         if username not in cookies:
             cookies[username] = {}
         for cookie in passed_cookies:
@@ -48,7 +50,9 @@ class CookieStorage():
                                     int(cookie['expiry'])
                                 )
                             if datetime.now() >= expires:
-                                LOGGER.info('"%s": Cookie is expired', username)
+                                LOGGER.info(
+                                        '"%s": Cookie is expired', username
+                                    )
                                 return None
                             cookies.append(cls.create_cookie(
                                 cookie_name,
@@ -75,4 +79,14 @@ class CookieStorage():
             json.dump(cookies, cookies_file)
         LOGGER.info('"%s": Removed cookie', username)
 
-
+    @staticmethod
+    def create_cookie(name, expiry, value):
+        """Create cookie"""
+        return {
+            'domain': 'rivalregions.com',
+            'name': name,
+            'path': '/',
+            'secure': False,
+            'expires': expiry,
+            'value': value,
+        }

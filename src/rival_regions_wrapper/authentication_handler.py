@@ -11,7 +11,7 @@ import cfscrape
 
 from rival_regions_wrapper import LOGGER
 
-from .cookie_storage import CookieStorage
+from .cookie_handler import CookieHandler
 from .browser import StealthBrowser as Browser
 
 
@@ -53,7 +53,7 @@ def session_handler(func):
         try:
             return func(*args, **kwargs)
         except (SessionExpireException, ConnectionError, ConnectionResetError):
-            CookieStorage.remove_cookie(instance.username)
+            CookieHandler.remove_cookie(instance.username)
             instance.login()
             return try_run(instance, func, *args, **kwargs)
         except NoLogginException:
@@ -91,7 +91,7 @@ class AuthenticationHandler:
                 '"%s": start login, method: "%s"',
                 self.username, self.login_method
             )
-        cookies = CookieStorage.get_cookies(self.username)
+        cookies = CookieHandler.get_cookies(self.username)
         if not cookies:
             cookies = []
             LOGGER.info(
@@ -129,7 +129,7 @@ class AuthenticationHandler:
                         '"%s": "value": %s, "expiry": %s',
                         self.username, value, expiry
                     )
-                cookie = CookieStorage.create_cookie(
+                cookie = CookieHandler.create_cookie(
                         'PHPSESSID',
                         expiry,
                         value
@@ -149,7 +149,7 @@ class AuthenticationHandler:
                     expiry = browser_cookie.get('expiry', None)
                     value = browser_cookie.get('value', None)
                     cookies.append(
-                        CookieStorage.create_cookie(
+                        CookieHandler.create_cookie(
                             cookie_name,
                             expiry,
                             value
@@ -162,7 +162,7 @@ class AuthenticationHandler:
                 else:
                     raise NoCookieException()
 
-            CookieStorage.write_cookies(self.username, cookies)
+            CookieHandler.write_cookies(self.username, cookies)
             LOGGER.debug('"%s": closing login tab', self.username)
             browser.close_current_tab()
         else:
@@ -309,7 +309,7 @@ class AuthenticationHandler:
                 raise SessionExpireException()
             browser = Browser(showWindow=self.show_window)
             browser.go_to('https://rivalregions.com/')
-            for cookie in CookieStorage.get_cookies(self.username):
+            for cookie in CookieHandler.get_cookies(self.username):
                 browser.add_cookie(cookie)
             browser.go_to(
                     'https://rivalregions.com/#slide/chat/lang_{}'
@@ -337,7 +337,7 @@ class AuthenticationHandler:
                 raise SessionExpireException()
             browser = Browser(showWindow=self.show_window)
             browser.go_to('https://rivalregions.com/')
-            for cookie in CookieStorage.get_cookies(self.username):
+            for cookie in CookieHandler.get_cookies(self.username):
                 browser.add_cookie(cookie)
             browser.go_to(
                     'https://rivalregions.com/#messages/{}'.format(user_id)
@@ -368,7 +368,7 @@ class AuthenticationHandler:
             browser.go_to('https://rivalregions.com/')
             for cookie_name, value in self.session.cookies.get_dict().items():
                 browser.add_cookie(
-                    CookieStorage.create_cookie(cookie_name, None, value)
+                    CookieHandler.create_cookie(cookie_name, None, value)
                 )
             browser.go_to(
                     'https://rivalregions.com/#slide/conference/{}'
