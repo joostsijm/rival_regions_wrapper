@@ -1,11 +1,12 @@
 """
-Authentication handeler module
+Authentication handler module
 """
 
 import time
-
 import sys
 import re
+
+from python_anticaptcha import AnticaptchaClient, ImageToTextTask
 
 import requests
 import cfscrape
@@ -13,34 +14,8 @@ import cfscrape
 from rival_regions_wrapper import LOGGER, login_methods
 from rival_regions_wrapper.cookie_handler import CookieHandler
 from rival_regions_wrapper.browser import Browser
-
-
-class RRClientException(Exception):
-    """RR exception"""
-    def __init__(self, *args, **kwargs):
-        Exception.__init__(self, *args, **kwargs)
-        LOGGER.warning('RRClientException')
-
-
-class SessionExpireException(Exception):
-    """Raise when session has expired"""
-    def __init__(self, *args, **kwargs):
-        Exception.__init__(self, *args, **kwargs)
-        LOGGER.warning('Session has expired')
-
-
-class NoLogginException(Exception):
-    """Raise exception when client isn't logged in"""
-    def __init__(self, *args, **kwargs):
-        Exception.__init__(self, *args, **kwargs)
-        LOGGER.warning('Not logged in')
-
-
-class NoCookieException(Exception):
-    """Raise exception when there is no cookie found"""
-    def __init__(self, *args, **kwargs):
-        Exception.__init__(self, *args, **kwargs)
-        LOGGER.warning('No cookie found')
+from rival_regions_wrapper.exceptions import SessionExpireException, \
+        NoLogginException, NoCookieException
 
 
 def session_handler(func):
@@ -71,9 +46,11 @@ class AuthenticationHandler:
     username = None
     password = None
     session = None
+    captcha_client = None
 
-    def __init__(self, show_window=False):
+    def __init__(self, show_window=False, captcha_client=None):
         self.show_window = show_window
+        self.captcha_client = captcha_client
         LOGGER.info('Initialize authentication handler, show window: "%s"',
                     self.show_window)
 
@@ -113,7 +90,11 @@ class AuthenticationHandler:
 
             if self.login_method in login_method_dict:
                 browser = login_method_dict[self.login_method](
-                        browser, auth_text, self.username, self.password
+                        browser,
+                        auth_text,
+                        self.username,
+                        self.password,
+                        self.captcha_client
                     )
             else:
                 LOGGER.info(
@@ -255,6 +236,7 @@ class AuthenticationHandler:
     @classmethod
     def check_response(cls, response):
         """Check resonse for authentication"""
+        # print(response.text)
         if "Session expired, please, reload the page" in response.text or \
                 'window.location="https://rivalregions.com";' in response.text:
             raise SessionExpireException()

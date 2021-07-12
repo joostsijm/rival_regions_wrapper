@@ -20,6 +20,7 @@ pathlib2 = "*"
 requests = "*"
 selenium-stealth = "*"
 webbot = "*"
+python-anticaptcha = "*"
 
 [requires]
 python_version = "3"

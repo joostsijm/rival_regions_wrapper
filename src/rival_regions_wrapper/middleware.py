@@ -22,8 +22,9 @@ class MiddlewareBase(ABC):
 class LocalAuthentication(MiddlewareBase):
     """Local authentication"""
 
-    def __init__(self, username, password, login_method, show_window=False):
-        self.client = AuthenticationHandler(show_window)
+    def __init__(self, username, password, login_method,
+            show_window=False, captcha_client=None):
+        self.client = AuthenticationHandler(show_window, captcha_client)
         self.client.set_credentials({
             'username': username,
             'password': password,

@@ -25,6 +25,7 @@ setuptools.setup(
         "requests",
         "selenium-stealth",
         "webbot",
+        "python-anticaptcha",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

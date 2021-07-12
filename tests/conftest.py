@@ -5,6 +5,7 @@ import os
 import pytest
 import _pytest.skipping
 from dotenv import load_dotenv
+from python_anticaptcha import AnticaptchaClient
 
 from rival_regions_wrapper.middleware import LocalAuthentication
 
@@ -49,9 +50,16 @@ def api_wrapper():
     username = os.environ.get('USERNAME', None)
     password = os.environ.get('PASSWORD', None)
     login_method = os.environ.get('LOGIN_METHOD', None)
+    captcha_key = os.environ.get('CAPTCHA_KEY', None)
     if None in (username, password, login_method):
         raise MissingAuthenticationError(
             'Load the following variables in your user environment: '
             'username, password, login_method'
         )
-    return LocalAuthentication(username, password, login_method)
+    return LocalAuthentication(
+            username,
+            password,
+            login_method,
+            False,
+            AnticaptchaClient(captcha_key),
+        )
