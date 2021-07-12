@@ -4,6 +4,8 @@ import re
 
 from bs4 import BeautifulSoup
 
+from rival_regions_wrapper.api_wrapper.abstract_wrapper import AbstractWrapper
+
 
 RESOURCE_DICT = {
     'oil': 'oil',
@@ -14,11 +16,8 @@ RESOURCE_DICT = {
 }
 
 
-class Work():
+class Work(AbstractWrapper):
     """Wrapper class for work"""
-    def __init__(self, api_wrapper):
-        self.api_wrapper = api_wrapper
-
     def page(self):
         """Get work page"""
         path = 'work'

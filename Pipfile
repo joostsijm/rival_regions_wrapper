@@ -9,17 +9,17 @@ pytest = "*"
 pytest-vcr = "*"
 tox = "*"
 tox-venv = "*"
+pylint = "*"
 
 [packages]
 appdirs = "*"
 beautifulsoup4 = "*"
 cfscrape = "*"
-requests = "*"
-webbot = "*"
 python-dateutil = "*"
 pathlib2 = "*"
-selenium-stealth= "*"
-selenium = "*"
+requests = "*"
+selenium-stealth = "*"
+webbot = "*"
 
 [requires]
 python_version = "3"

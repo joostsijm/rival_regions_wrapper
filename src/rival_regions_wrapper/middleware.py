@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 import requests
 
-from rival_regions_wrapper import AuthenticationHandler
+from rival_regions_wrapper.authentication_handler import AuthenticationHandler
 
 
 class MiddlewareBase(ABC):

@@ -5,14 +5,12 @@ import re
 
 from bs4 import BeautifulSoup
 
-from rival_regions_wrapper import functions
+from rival_regions_wrapper import util
+from rival_regions_wrapper.api_wrapper.abstract_wrapper import AbstractWrapper
 
 
-class Article():
+class Article(AbstractWrapper):
     """Wrapper class for article"""
-    def __init__(self, api_wrapper):
-        self.api_wrapper = api_wrapper
-
     def info(self, article_id):
         """Get artcile"""
         path = 'news/show/{}'.format(article_id)
@@ -33,7 +31,9 @@ class Article():
 
         article_info = {
             'article_id': article_id,
-            'article_title': unicodedata.normalize("NFKD", soup.select_one('.title_totr').text),
+            'article_title': unicodedata.normalize(
+                "NFKD", soup.select_one('.title_totr').text
+            ),
             'author_name': re.sub(r',\s\skarma.*$', '', author.text),
             'author_id': int(author['action'].replace('slide/profile/', '')),
             'region_name': region.text,
@@ -45,7 +45,9 @@ class Article():
         }
 
         if newspaper:
-            article_info['newspaper_id'] = int(newspaper['action'].replace('newspaper/show/', ''))
+            article_info['newspaper_id'] = int(
+                    newspaper['action'].replace('newspaper/show/', '')
+                )
             article_info['newspaper_name'] = newspaper.text
         else:
             article_info['newspaper_id'] = None
@@ -59,5 +61,5 @@ class Article():
 
         date_element = soup.select_one('.news_conent_title')
         date_string = date_element.text.replace('✘', '').strip()
-        article_info['post_date'] = functions.parse_date(date_string)
+        article_info['post_date'] = util.parse_date(date_string)
         return article_info

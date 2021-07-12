@@ -6,14 +6,12 @@ import unicodedata
 
 from bs4 import BeautifulSoup
 
-from rival_regions_wrapper import functions
+from rival_regions_wrapper import util
+from rival_regions_wrapper.api_wrapper.abstract_wrapper import AbstractWrapper
 
 
-class War():
+class War(AbstractWrapper):
     """Wrapper class for war"""
-    def __init__(self, api_wrapper):
-        self.api_wrapper = api_wrapper
-
     def page(self):
         """Get training war"""
         path = 'war'
@@ -81,7 +79,7 @@ class War():
                 )
             if results:
                 war_info['finish_date'] = \
-                    functions.parse_date(results.group(0))
+                    util.parse_date(results.group(0))
 
         war_info['war_units'] = {}
         for war_unit in soup.select('.war_w_unit_div'):

@@ -4,11 +4,14 @@ import re
 
 from bs4 import BeautifulSoup
 
+from rival_regions_wrapper import authentication_handler, LOGGER
+from rival_regions_wrapper.api_wrapper.abstract_wrapper import AbstractWrapper
 
-class Profile():
+
+class Profile(AbstractWrapper):
     """Wrapper class for profile"""
     def __init__(self, api_wrapper, profile_id):
-        self.api_wrapper = api_wrapper
+        AbstractWrapper.__init__(self, api_wrapper)
         self.profile_id = profile_id
 
     def info(self):
@@ -22,9 +25,33 @@ class Profile():
             'profile_id': self.profile_id,
             'name': re.sub(r'.*:\s', '', soup.find('h1').text),
             'level': int(re.sub(r'^Level\:\s|\s\(.*\)$', '', level)),
-            'level_percentage': int(re.sub(r'^Level\:\s(\d+)\s\(|\s\%\)$', '', level)),
+            'level_percentage': int(
+                re.sub(r'^Level\:\s(\d+)\s\(|\s\%\)$', '', level)
+            ),
             'strenght': int(perks[0].text),
             'education': int(perks[1].text),
-            'endurance': int(perks[2].text)
+            'endurance': int(perks[2].text),
         }
         return profile
+
+    @authentication_handler.session_handler
+    def message(self, message):
+        """send personal message"""
+        LOGGER.info(
+                '"%s": PM: user id %s',
+                self.api_wrapper.client.username, self.profile_id
+            )
+        browser = self.api_wrapper.client.get_browser()
+        try:
+            browser.go_to(
+                    'https://rivalregions.com/#messages/{}'.format(
+                            self.profile_id
+                        )
+                )
+            self.api_wrapper.client.send_chat(browser, message)
+            LOGGER.info(
+                    '"%s:" PM: user id %s, finished sending message',
+                    self.api_wrapper.client.username, self.profile_id
+                )
+        finally:
+            browser.close_current_tab()
