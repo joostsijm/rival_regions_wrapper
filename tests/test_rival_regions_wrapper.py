@@ -6,8 +6,9 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from rival_regions_wrapper.api_wrapper import Profile, Storage, Market, \
-        ResourceState, Perks, Craft, Overview, War, Work, Article, Conference
+from rival_regions_wrapper.wrapper import Profile, Storage, Market, \
+        ResourceState, Perks, Craft, Overview, War, Work, Article, \
+        Conference, LanguageChat
 
 
 @pytest.fixture
@@ -20,9 +21,9 @@ def profile_keys():
 
 
 @pytest.mark.vcr()
-def test_profile_info(api_wrapper, profile_keys):
+def test_profile_info(middleware, profile_keys):
     """Test an API call to get client info"""
-    profile_instance = Profile(api_wrapper, 192852686)
+    profile_instance = Profile(middleware, 192852686)
     response = profile_instance.info()
 
     assert isinstance(response, dict), "The response should be a dict"
@@ -40,9 +41,9 @@ def test_profile_info(api_wrapper, profile_keys):
 
 
 @pytest.mark.skip(reason="message request")
-def test_profile_message(api_wrapper):
+def test_profile_message(middleware):
     """Test an API to send message to profile"""
-    Profile(api_wrapper, 2000340574).message('hi')
+    Profile(middleware, 2000340574).message('hi')
 
 
 @pytest.fixture
@@ -63,9 +64,9 @@ def storage_keys():
 
 
 @pytest.mark.vcr()
-def test_storage_info(api_wrapper, storage_keys):
+def test_storage_info(middleware, storage_keys):
     """Test an API call to get storage info"""
-    response = Storage(api_wrapper).info()
+    response = Storage(middleware).info()
 
     assert isinstance(response, dict), "The response should be a dict"
     assert set(storage_keys).issubset(response.keys()), \
@@ -79,10 +80,10 @@ def market_keys():
 
 
 @pytest.mark.vcr()
-def test_market_info(api_wrapper, market_keys):
+def test_market_info(middleware, market_keys):
     """Test an API call to get market info"""
     resource = 'oil'
-    response = Market(api_wrapper).info(resource)
+    response = Market(middleware).info(resource)
 
     assert isinstance(response, list), "The response should be a list"
     if response:
@@ -110,11 +111,11 @@ def resource_keys():
 
 
 @pytest.mark.vcr()
-def test_resource_state_info(api_wrapper, resource_keys):
+def test_resource_state_info(middleware, resource_keys):
     """Test an API call to get market info"""
     state = 3382
     resource = 'oil'
-    response = ResourceState(api_wrapper, state).info(resource)
+    response = ResourceState(middleware, state).info(resource)
 
     assert isinstance(response, list), "The response should be a list"
     if response:
@@ -146,9 +147,9 @@ def perks_keys():
 
 
 @pytest.mark.vcr()
-def test_perks_info(api_wrapper, perks_keys):
+def test_perks_info(middleware, perks_keys):
     """Test an API call to get perks info"""
-    response = Perks(api_wrapper).info()
+    response = Perks(middleware).info()
 
     assert isinstance(response, dict), \
         "The response should be a dict"
@@ -171,11 +172,11 @@ def test_perks_info(api_wrapper, perks_keys):
 
 
 @pytest.mark.skip(reason="Update request")
-def test_perks_upgrade(api_wrapper):
+def test_perks_upgrade(middleware):
     """Test an API call to upgrade perk"""
-    perk = 'endurance'
-    upgrade_type = 'money'
-    Perks(api_wrapper).upgrade(perk, upgrade_type)
+    perk = 'strenght'
+    upgrade_type = 'gold'
+    Perks(middleware).upgrade(perk, upgrade_type)
 
 
 @pytest.fixture
@@ -185,10 +186,10 @@ def craft_keys():
 
 
 @pytest.mark.skip(reason="Update request")
-def test_craft_produce(api_wrapper):
+def test_craft_produce(middleware):
     """Test an API call to produce new item"""
     item = 'energy_drink'
-    Craft(api_wrapper).produce(item, 10)
+    Craft(middleware).produce(item, 10)
 
     assert True
 
@@ -200,9 +201,9 @@ def overview_info_keys():
 
 
 @pytest.mark.vcr()
-def test_overview_info(api_wrapper, overview_info_keys):
+def test_overview_info(middleware, overview_info_keys):
     """Test an API call for overview"""
-    response = Overview(api_wrapper).info()
+    response = Overview(middleware).info()
 
     assert isinstance(response, dict), "The response hould be a dict"
     assert set(overview_info_keys).issubset(response.keys()), \
@@ -219,9 +220,9 @@ def overview_status_keys():
 
 
 @pytest.mark.vcr()
-def test_overview_status(api_wrapper, overview_status_keys):
+def test_overview_status(middleware, overview_status_keys):
     """Test an API cal for status"""
-    response = Overview(api_wrapper).status()
+    response = Overview(middleware).status()
 
     assert isinstance(response, dict), "The response hould be a dict"
     assert set(overview_status_keys).issubset(response.keys()), \
@@ -229,9 +230,9 @@ def test_overview_status(api_wrapper, overview_status_keys):
 
 
 @pytest.mark.vcr()
-def test_war_page(api_wrapper):
+def test_war_page(middleware):
     """Test getting training war"""
-    response = War(api_wrapper).page()
+    response = War(middleware).page()
 
     assert isinstance(response, dict), "The response should be a dict"
     if response['training_war']:
@@ -240,9 +241,9 @@ def test_war_page(api_wrapper):
 
 
 @pytest.mark.vcr()
-def test_war_info(api_wrapper):
+def test_war_info(middleware):
     """Test war info"""
-    war = War(api_wrapper)
+    war = War(middleware)
     war_page = war.page()
     war_id = war_page['training_war']
     response = war.info(war_id)
@@ -270,10 +271,10 @@ def test_war_info(api_wrapper):
 
 
 @pytest.mark.vcr()
-def test_war_info_ground_war(api_wrapper):
+def test_war_info_ground_war(middleware):
     """Test war info"""
     war_id = 329541
-    response = War(api_wrapper).info(war_id)
+    response = War(middleware).info(war_id)
 
     assert isinstance(response, dict), "The response should be a dict"
     assert response['type'] == 'war', "Type should be a ground war"
@@ -301,59 +302,59 @@ def test_war_info_ground_war(api_wrapper):
 
 
 @pytest.mark.vcr()
-def test_war_info_coup(api_wrapper):
+def test_war_info_coup(middleware):
     """Test war info"""
     war_id = 329518
-    response = War(api_wrapper).info(war_id)
+    response = War(middleware).info(war_id)
 
     assert isinstance(response, dict), "The response should be a dict"
     assert response['type'] == 'coup', "Type should be a coup"
 
 
 @pytest.mark.vcr()
-def test_war_info_revolution(api_wrapper):
+def test_war_info_revolution(middleware):
     """Test war info"""
     war_id = 329461
-    response = War(api_wrapper).info(war_id)
+    response = War(middleware).info(war_id)
 
     assert isinstance(response, dict), "The response should be a dict"
     assert response['type'] == 'revolution', "Type should be a revolution"
 
 
 @pytest.mark.vcr()
-def test_war_info_trooper_war(api_wrapper):
+def test_war_info_trooper_war(middleware):
     """Test war info"""
     war_id = 329458
-    response = War(api_wrapper).info(war_id)
+    response = War(middleware).info(war_id)
 
     assert isinstance(response, dict), "The response should be a dict"
     assert response['type'] == 'troopers war', "Type should be a trooper war"
 
 
 @pytest.mark.vcr()
-def test_war_info_sea_war(api_wrapper):
+def test_war_info_sea_war(middleware):
     """Test war info"""
     war_id = 329618
-    response = War(api_wrapper).info(war_id)
+    response = War(middleware).info(war_id)
 
     assert isinstance(response, dict), "The response should be a dict"
     assert response['type'] == 'sea war', "Type should be a sea war"
 
 
 @pytest.mark.vcr()
-def test_war_info_space_war(api_wrapper):
+def test_war_info_space_war(middleware):
     """Test war info"""
     war_id = 329531
-    response = War(api_wrapper).info(war_id)
+    response = War(middleware).info(war_id)
 
     assert isinstance(response, dict), "The response should be a dict"
     assert response['type'] == 'space war', "Type should be a space war"
 
 
 @pytest.mark.vcr()
-def test_work_info(api_wrapper):
+def test_work_info(middleware):
     """Test work info"""
-    response = Work(api_wrapper).page()
+    response = Work(middleware).page()
 
     assert isinstance(response, dict), "The response should be a dict"
     assert isinstance(response['factory'], dict), "Factory should be a dict"
@@ -374,10 +375,10 @@ def article_keys():
 
 
 @pytest.mark.vcr()
-def test_article_info_one(api_wrapper, article_keys):
+def test_article_info_one(middleware, article_keys):
     """Test article info"""
     article_id = 2708696
-    response = Article(api_wrapper).info(article_id)
+    response = Article(middleware).info(article_id)
 
     assert isinstance(response, dict), "The resonse should be a dict"
     assert set(article_keys).issubset(response.keys()), \
@@ -413,10 +414,10 @@ def test_article_info_one(api_wrapper, article_keys):
 
 
 @pytest.mark.vcr()
-def test_article_info_two(api_wrapper, article_keys):
+def test_article_info_two(middleware, article_keys):
     """Test article info"""
     article_id = 2862982
-    response = Article(api_wrapper).info(article_id)
+    response = Article(middleware).info(article_id)
 
     assert isinstance(response, dict), "The resonse should be a dict"
     assert set(article_keys).issubset(response.keys()), \
@@ -447,28 +448,28 @@ def test_article_info_two(api_wrapper, article_keys):
         "Post date should be a datetime"
 
 
-@pytest.mark.skip(reason="message request")
-def test_conference_message(api_wrapper):
+@pytest.mark.skip(reason="conference message request")
+def test_conference_message(middleware):
     """Test conference message"""
     conference_id = 439289
-    Conference(api_wrapper, conference_id).message('hi')
+    Conference(middleware, conference_id).message('hi')
 
 
-@pytest.mark.skip(reason="notification request")
-def test_conference_notification(api_wrapper):
+@pytest.mark.skip(reason="conference notification request")
+def test_conference_notification(middleware):
     """Test conference notification"""
     conference_id = 439289
-    Conference(api_wrapper, conference_id).notification('hi', True)
+    Conference(middleware, conference_id).notification('hi', True)
 
 
-@pytest.mark.skip(reason="notification request")
-def test_conference_change_title(api_wrapper):
+@pytest.mark.skip(reason="conference title change request")
+def test_conference_change_title(middleware):
     """Test conference change title"""
     conference_id = 439289
-    Conference(api_wrapper, conference_id).change_title('new title')
+    Conference(middleware, conference_id).change_title('new title')
 
 
-@pytest.mark.skip(reason="message request")
-def test_language_chat_(api_wrapper):
-    """Test an API to send message to profile"""
-    Profile(api_wrapper, 2000340574).message('hi')
+@pytest.mark.skip(reason="language chat message request")
+def test_language_chat_message(middleware):
+    """Test sending message to language chat"""
+    LanguageChat(middleware, 'da').message('hi')

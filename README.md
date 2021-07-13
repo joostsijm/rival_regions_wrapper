@@ -76,7 +76,7 @@ region = authentication.get('listed/upgrades/{}'.format(region_id))
 
 Example of API wrapper to get oil current available resources from a state
 ```python
-from rival_regions_wrapper.api_wrapper import ResourceState
+from rival_regions_wrapper.wrapper import ResourceState
 
 state = 3382
 resource = 'oil'

@@ -4,14 +4,16 @@ from abc import ABC, abstractmethod
 
 import requests
 
+from rival_regions_wrapper import api
 from rival_regions_wrapper.authentication_handler import AuthenticationHandler
 
 
 class MiddlewareBase(ABC):
     """Middleware abstract base class"""
+    username = None
 
     @abstractmethod
-    def get(self, path, add_c_var=False):
+    def get(self, path, add_var_c=False):
         """Send get request"""
 
     @abstractmethod
@@ -21,37 +23,39 @@ class MiddlewareBase(ABC):
 
 class LocalAuthentication(MiddlewareBase):
     """Local authentication"""
-
-    def __init__(self, username, password, login_method,
-            show_window=False, captcha_client=None):
-        self.client = AuthenticationHandler(show_window, captcha_client)
-        self.client.set_credentials({
-            'username': username,
-            'password': password,
-            'login_method': login_method
-        })
+    def __init__(self, show_window=False, captcha_client=None):
         super().__init__()
+        self.authentication_handler = AuthenticationHandler(
+                show_window, captcha_client
+            )
 
-    def get(self, path, add_c_var=False):
+    def set_credentials(self, username, password, login_method):
+        """Set login credentials"""
+        self.username = username
+        self.authentication_handler.set_credentials(
+                login_method, username, password
+            )
+        return self
+
+    def get(self, path, add_var_c=False):
         """Send get requests"""
-        return self.client.get(path)
+        return api.get(self, path, add_var_c)
 
     def post(self, path, data=None):
         """Send post request"""
-        return self.client.post(path, data=data)
+        return api.post(self, path, data=data)
 
 
 class RemoteAuthentication(MiddlewareBase):
     """Remote authentication"""
-
     def __init__(self, api_url, authentication_key):
+        super().__init__()
         self.api_url = api_url
         self.headers = {
             'Authorization': authentication_key
         }
-        super().__init__()
 
-    def get(self, path, add_c_var=False):
+    def get(self, path, add_var_c=False):
         """Send get requests"""
         try:
             response = requests.get(

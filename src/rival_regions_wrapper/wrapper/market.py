@@ -5,7 +5,7 @@ import re
 from bs4 import BeautifulSoup
 
 from rival_regions_wrapper import util
-from rival_regions_wrapper.api_wrapper.abstract_wrapper import AbstractWrapper
+from rival_regions_wrapper.wrapper.abstract_wrapper import AbstractWrapper
 
 
 class Market(AbstractWrapper):
@@ -15,7 +15,7 @@ class Market(AbstractWrapper):
         if isinstance(resource, str) and resource in util.ITEM_KEYS:
             resource = util.ITEM_KEYS[resource]
         path = 'storage/listed/{}'.format(resource)
-        response = self.api_wrapper.get(path)
+        response = self.middleware.get(path)
         soup = BeautifulSoup(response, 'html.parser')
 
         offers_tree = soup.find_all(class_='list_link')

@@ -5,6 +5,13 @@ Exceptions used in Rival Regions Wrapper
 from rival_regions_wrapper import LOGGER
 
 
+class InvalidLoginMethodException(Exception):
+    """Raise exception when login method is invalid"""
+    def __init__(self, *args, **kwargs):
+        Exception.__init__(self, *args, **kwargs)
+        LOGGER.warning('Login method invalid')
+
+
 class RRClientException(Exception):
     """RR exception"""
     def __init__(self, *args, **kwargs):

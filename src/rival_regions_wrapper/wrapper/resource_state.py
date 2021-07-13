@@ -4,13 +4,13 @@ import re
 
 from bs4 import BeautifulSoup
 
-from rival_regions_wrapper.api_wrapper.abstract_wrapper import AbstractWrapper
+from rival_regions_wrapper.wrapper.abstract_wrapper import AbstractWrapper
 
 
 class ResourceState(AbstractWrapper):
     """Wrapper class for resource state"""
-    def __init__(self, api_wrapper, state_id):
-        AbstractWrapper.__init__(self, api_wrapper)
+    def __init__(self, middleware, state_id):
+        AbstractWrapper.__init__(self, middleware)
         self.state_id = state_id
 
     def info(self, resource):
@@ -24,7 +24,7 @@ class ResourceState(AbstractWrapper):
         if isinstance(resource, int) and resource in keys:
             resource = keys[resource]
         path = 'listed/stateresources/{}/{}'.format(self.state_id, resource)
-        response = self.api_wrapper.get(path)
+        response = self.middleware.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         regions_tree = soup.find_all(class_='list_link')
         regions = []

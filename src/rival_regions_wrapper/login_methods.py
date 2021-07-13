@@ -13,7 +13,7 @@ from rival_regions_wrapper.exceptions import NoCaptchaClientException, \
 # This should be working
 def login_google(browser, auth_text, username, password, captcha_client=None):
     """login using Google"""
-    LOGGER.info('"%s": Google: Login start', username)
+    LOGGER.info('Google: "%s": Login start', username)
     auth_text1 = auth_text.split('\t<a href="')
     auth_text2 = auth_text1[1].split('" class="sa')
     time.sleep(1)
@@ -21,34 +21,34 @@ def login_google(browser, auth_text, username, password, captcha_client=None):
 
     # browser.get_screenshot_as_file('test_1.png')
 
-    LOGGER.info('"%s": Google: Typing in username', username)
+    LOGGER.info('Google: "%s": Typing in username', username)
     browser.type(username, into='Email')
 
     # browser.get_screenshot_as_file('test_2.png')
 
-    LOGGER.info('"%s": Google: pressing next button', username)
+    LOGGER.info('Google: "%s": pressing next button', username)
     browser.click(css_selector='#next')
     time.sleep(1)
 
     # browser.get_screenshot_as_file('test_3.png')
 
     if browser.driver.find_elements_by_css_selector('#captcha-box'):
-        LOGGER.info('"%s": Google: Captcha present', username)
+        LOGGER.info('Google: "%s": Captcha present', username)
         if not captcha_client:
             raise NoCaptchaClientException()
         captcha_url = browser \
                 .find_elements(css_selector='#captcha-img img')[0] \
                 .get_attribute('src')
-        LOGGER.debug('"%s": Google: Captcha url: "%s"', username, captcha_url)
+        LOGGER.debug('Google: "%s": Captcha url: "%s"', username, captcha_url)
         image = requests.get(captcha_url, stream=True).raw
         image.decode_content = True
 
         task = ImageToTextTask(image)
         job = captcha_client.createTask(task)
-        LOGGER.info('"%s": Google: Start solve captcha', username)
+        LOGGER.info('Google: "%s": Start solve captcha', username)
         job.join()
 
-        LOGGER.info('"%s": Google: captcha: "%s"', username, job.get_captcha_text())
+        LOGGER.info('Google: %s": captcha: "%s"', username, job.get_captcha_text())
         browser.type(
                 job.get_captcha_text(),
                 css_selector='#identifier-captcha-input'
@@ -63,12 +63,12 @@ def login_google(browser, auth_text, username, password, captcha_client=None):
     # with open('source.html', 'w') as source:
     #     source.write(browser.get_page_source())
 
-    LOGGER.info('"%s": Google: Typing in password', username)
+    LOGGER.info('Google: "%s": Typing in password', username)
     browser.type(password, css_selector='input')
 
     # browser.get_screenshot_as_file('test_5.png')
 
-    LOGGER.info('"%s": Google: pressing sign in button', username)
+    LOGGER.info('Google: "%s": pressing sign in button', username)
     browser.click(css_selector='#submit')
     time.sleep(3)
 

@@ -5,7 +5,7 @@ import re
 from bs4 import BeautifulSoup
 
 from rival_regions_wrapper import util
-from rival_regions_wrapper.api_wrapper.abstract_wrapper import AbstractWrapper
+from rival_regions_wrapper.wrapper.abstract_wrapper import AbstractWrapper
 
 
 class Perks(AbstractWrapper):
@@ -13,7 +13,7 @@ class Perks(AbstractWrapper):
     def info(self):
         """Get perks"""
         path = 'main/content'
-        response = self.api_wrapper.get(path)
+        response = self.middleware.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         return self.info_parse(soup)
 
@@ -65,5 +65,7 @@ class Perks(AbstractWrapper):
         if isinstance(upgrade_type, str) and upgrade_type in upgrade_type_keys:
             upgrade_type = upgrade_type_keys[upgrade_type]
 
-        self.api_wrapper.post('perks/up/{}/{}'.format(perk, upgrade_type))
+        self.middleware.post(
+                'perks/up/{}/{}'.format(perk, upgrade_type)
+            )
         return True

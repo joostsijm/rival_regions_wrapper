@@ -45,7 +45,7 @@ def vcr(vcr):
 
 
 @pytest.fixture(scope="module")
-def api_wrapper():
+def middleware():
     """Set up wrapper before test"""
     username = os.environ.get('USERNAME', None)
     password = os.environ.get('PASSWORD', None)
@@ -56,10 +56,9 @@ def api_wrapper():
             'Load the following variables in your user environment: '
             'username, password, login_method'
         )
-    return LocalAuthentication(
-            username,
-            password,
-            login_method,
-            False,
-            AnticaptchaClient(captcha_key),
+    _middleware = LocalAuthentication(
+            False, AnticaptchaClient(captcha_key)
+        )
+    return _middleware.set_credentials(
+            username, password, login_method
         )

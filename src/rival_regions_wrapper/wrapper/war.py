@@ -7,7 +7,7 @@ import unicodedata
 from bs4 import BeautifulSoup
 
 from rival_regions_wrapper import util
-from rival_regions_wrapper.api_wrapper.abstract_wrapper import AbstractWrapper
+from rival_regions_wrapper.wrapper.abstract_wrapper import AbstractWrapper
 
 
 class War(AbstractWrapper):
@@ -15,7 +15,7 @@ class War(AbstractWrapper):
     def page(self):
         """Get training war"""
         path = 'war'
-        response = self.api_wrapper.get(path)
+        response = self.middleware.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         pattern = re.compile(r'war\/details\/\d+')
         script = soup.find('script', text=pattern)
@@ -32,7 +32,7 @@ class War(AbstractWrapper):
     def info(self, war_id):
         """Get war info"""
         path = 'war/details/{}'.format(war_id)
-        response = self.api_wrapper.get(path)
+        response = self.middleware.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         war_info = {
             'war_id': war_id,

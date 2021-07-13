@@ -5,7 +5,7 @@ import re
 from bs4 import BeautifulSoup
 
 from rival_regions_wrapper import util
-from rival_regions_wrapper.api_wrapper.abstract_wrapper import AbstractWrapper
+from rival_regions_wrapper.wrapper.abstract_wrapper import AbstractWrapper
 
 
 class Craft(AbstractWrapper):
@@ -15,7 +15,7 @@ class Craft(AbstractWrapper):
         if isinstance(item, str) and item in util.ITEM_KEYS:
             item = util.ITEM_KEYS[item]
         path = 'storage/produce/{}'.format(item)
-        response = self.api_wrapper.get(path)
+        response = self.middleware.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         resources = soup.select_one('.storage_produce_exp')
         resource_dict = {
@@ -47,5 +47,7 @@ class Craft(AbstractWrapper):
         """Craft item"""
         if isinstance(item, str) and item in util.ITEM_KEYS:
             item = util.ITEM_KEYS[item]
-        self.api_wrapper.post('storage/newproduce/{}/{}'.format(item, amount))
+        self.middleware.post(
+                'storage/newproduce/{}/{}'.format(item, amount)
+            )
         return True

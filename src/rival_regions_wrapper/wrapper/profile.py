@@ -4,20 +4,20 @@ import re
 
 from bs4 import BeautifulSoup
 
-from rival_regions_wrapper import authentication_handler, LOGGER
-from rival_regions_wrapper.api_wrapper.abstract_wrapper import AbstractWrapper
+from rival_regions_wrapper import LOGGER, api
+from rival_regions_wrapper.wrapper.abstract_wrapper import AbstractWrapper
 
 
 class Profile(AbstractWrapper):
     """Wrapper class for profile"""
-    def __init__(self, api_wrapper, profile_id):
-        AbstractWrapper.__init__(self, api_wrapper)
+    def __init__(self, middleware, profile_id):
+        AbstractWrapper.__init__(self, middleware)
         self.profile_id = profile_id
 
     def info(self):
         """Get profile"""
         path = 'slide/profile/{}'.format(self.profile_id)
-        response = self.api_wrapper.get(path)
+        response = self.middleware.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         level = soup.select_one('div.oil:nth-child(2) > div:nth-child(2)').text
         perks = soup.select('table tr:nth-child(2) span')
@@ -34,24 +34,10 @@ class Profile(AbstractWrapper):
         }
         return profile
 
-    @authentication_handler.session_handler
     def message(self, message):
         """send personal message"""
-        LOGGER.info(
-                '"%s": PM: user id %s',
-                self.api_wrapper.client.username, self.profile_id
+        LOGGER.info('"%s": PM: user id %s',
+                self.middleware.username,
+                self.profile_id
             )
-        browser = self.api_wrapper.client.get_browser()
-        try:
-            browser.go_to(
-                    'https://rivalregions.com/#messages/{}'.format(
-                            self.profile_id
-                        )
-                )
-            self.api_wrapper.client.send_chat(browser, message)
-            LOGGER.info(
-                    '"%s:" PM: user id %s, finished sending message',
-                    self.api_wrapper.client.username, self.profile_id
-                )
-        finally:
-            browser.close_current_tab()
+        api.profile_message(self.middleware, self.profile_id, message)

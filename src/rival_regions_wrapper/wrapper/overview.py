@@ -2,8 +2,8 @@
 
 from bs4 import BeautifulSoup
 
-from rival_regions_wrapper.api_wrapper.abstract_wrapper import AbstractWrapper
-from rival_regions_wrapper.api_wrapper.perks import Perks
+from rival_regions_wrapper.wrapper.abstract_wrapper import AbstractWrapper
+from rival_regions_wrapper.wrapper.perks import Perks
 
 
 class Overview(AbstractWrapper):
@@ -11,7 +11,7 @@ class Overview(AbstractWrapper):
     def info(self):
         """Get overview """
         path = 'main/content'
-        response = self.api_wrapper.get(path)
+        response = self.middleware.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         perks = Perks.info_parse(soup)
         auto_war = soup.select_one('.war_index_war span.pointer:nth-child(4)')
@@ -30,7 +30,7 @@ class Overview(AbstractWrapper):
     def status(self):
         """Get current status"""
         path = 'main'
-        response = self.api_wrapper.get(path)
+        response = self.middleware.get(path)
         soup = BeautifulSoup(response, 'html.parser')
         profile_url = soup.select_one('#header_my_avatar')['action']
         party_url = soup.select_one('#party_menu_members')['action']

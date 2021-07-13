@@ -6,7 +6,7 @@ import re
 from bs4 import BeautifulSoup
 
 from rival_regions_wrapper import util
-from rival_regions_wrapper.api_wrapper.abstract_wrapper import AbstractWrapper
+from rival_regions_wrapper.wrapper.abstract_wrapper import AbstractWrapper
 
 
 class Article(AbstractWrapper):
@@ -14,7 +14,7 @@ class Article(AbstractWrapper):
     def info(self, article_id):
         """Get artcile"""
         path = 'news/show/{}'.format(article_id)
-        response = self.api_wrapper.get(path)
+        response = self.middleware.get(path)
         soup = BeautifulSoup(response, 'html.parser')
 
         links = soup.select('.newspaper_links')

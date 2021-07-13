@@ -4,7 +4,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from rival_regions_wrapper.api_wrapper.abstract_wrapper import AbstractWrapper
+from rival_regions_wrapper.wrapper.abstract_wrapper import AbstractWrapper
 
 
 RESOURCE_DICT = {
@@ -21,7 +21,7 @@ class Work(AbstractWrapper):
     def page(self):
         """Get work page"""
         path = 'work'
-        response = self.api_wrapper.get(path)
+        response = self.middleware.get(path)
         soup = BeautifulSoup(response, 'html.parser')
 
         factory = soup.select_one('.work_item:nth-child(9)')

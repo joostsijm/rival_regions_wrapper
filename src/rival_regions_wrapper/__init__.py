@@ -28,10 +28,10 @@ STREAM_HANDLER = logging.StreamHandler()
 STREAM_HANDLER.setLevel(logging.INFO)
 
 # create formatter and add it to the handlers
-STREAM_FORMATTER = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+STREAM_FORMATTER = logging.Formatter('%(name)s - %(module)s - %(levelname)s - %(message)s')
 STREAM_HANDLER.setFormatter(STREAM_FORMATTER)
 FILE_FORMATTER = logging \
-        .Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        .Formatter('%(asctime)s - %(name)s - %(module)s - %(levelname)s - %(message)s')
 FILE_HANDLER.setFormatter(FILE_FORMATTER)
 
 # add the handlers to logger
