@@ -36,12 +36,13 @@ For now there is limited documentation how to use the wrapper classes.
 Read the files [here](https://github.com/joostsijm/rival_regions_wrapper/tree/dev/src/rival_regions_wrapper/wrapper) to see how they work.
 
 ## Examples
-Create LocalAuthentication middleware and log in with using environ variables.
+Create LocalAuthentication middleware and log in using environ variables.
 ```python
 import os
 from rival_regions_wrapper.middleware import LocalAuthentication
 
-authentication = LocalAuthentication(
+authentication = LocalAuthentication()
+authentication.set_credentials(
   os.environ["USERNAME"],
   os.environ["PASSWORD"],
   os.environ["LOGIN_METHOD"]
