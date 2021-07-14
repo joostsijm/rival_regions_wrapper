@@ -41,9 +41,9 @@ def test_profile_info(middleware, profile_keys):
 
 
 @pytest.mark.skip(reason="message request")
-def test_profile_message(middleware):
+def test_profile_message(middleware, profile_id, message):
     """Test an API to send message to profile"""
-    Profile(middleware, 2000340574).message('hi')
+    Profile(middleware, profile_id).message(message)
 
 
 @pytest.fixture
@@ -172,11 +172,9 @@ def test_perks_info(middleware, perks_keys):
 
 
 @pytest.mark.skip(reason="Update request")
-def test_perks_upgrade(middleware):
+def test_perks_upgrade(middleware, perk, perk_upgrade_type):
     """Test an API call to upgrade perk"""
-    perk = 'strenght'
-    upgrade_type = 'gold'
-    Perks(middleware).upgrade(perk, upgrade_type)
+    Perks(middleware).upgrade(perk, perk_upgrade_type)
 
 
 @pytest.fixture
@@ -186,11 +184,9 @@ def craft_keys():
 
 
 @pytest.mark.skip(reason="Update request")
-def test_craft_produce(middleware):
-    """Test an API call to produce new item"""
-    item = 'energy_drink'
-    Craft(middleware).produce(item, 10)
-
+def test_craft_produce(middleware, craft_item, craft_amount):
+    """Test an API call to craft a new item"""
+    Craft(middleware).produce(craft_item, craft_amount)
     assert True
 
 
@@ -449,27 +445,24 @@ def test_article_info_two(middleware, article_keys):
 
 
 @pytest.mark.skip(reason="conference message request")
-def test_conference_message(middleware):
+def test_conference_message(middleware, conference_id, message):
     """Test conference message"""
-    conference_id = 439289
-    Conference(middleware, conference_id).message('hi')
+    Conference(middleware, conference_id).message(message)
 
 
 @pytest.mark.skip(reason="conference notification request")
-def test_conference_notification(middleware):
+def test_conference_notification(middleware, conference_id, message):
     """Test conference notification"""
-    conference_id = 439289
-    Conference(middleware, conference_id).notification('hi', True)
+    Conference(middleware, conference_id).notification(message, True)
 
 
 @pytest.mark.skip(reason="conference title change request")
-def test_conference_change_title(middleware):
+def test_conference_change_title(middleware, conference_id, conference_title):
     """Test conference change title"""
-    conference_id = 439289
-    Conference(middleware, conference_id).change_title('new title')
+    Conference(middleware, conference_id).change_title(conference_title)
 
 
 @pytest.mark.skip(reason="language chat message request")
-def test_language_chat_message(middleware):
+def test_language_chat_message(middleware, language_chat, message):
     """Test sending message to language chat"""
-    LanguageChat(middleware, 'da').message('hi')
+    LanguageChat(middleware, language_chat).message(message)
