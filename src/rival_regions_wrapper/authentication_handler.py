@@ -4,14 +4,14 @@ Authentication handler module
 
 import re
 
-import requests
 import cfscrape
+from python_anticaptcha import AnticaptchaClient
 
-from rival_regions_wrapper import LOGGER, login_methods
+from rival_regions_wrapper import LOGGER, DATA_DIR, login_methods
 from rival_regions_wrapper.cookie_handler import CookieHandler
 from rival_regions_wrapper.browser import Browser
 from rival_regions_wrapper.exceptions import InvalidLoginMethodException, \
-        SessionExpireException, NoLogginException, NoCookieException
+        NoLogginException, NoCookieException
 
 
 LOGIN_METHOD_DICT = {
@@ -26,12 +26,15 @@ LOGIN_METHOD_DICT = {
 
 class AuthenticationHandler:
     """class for RR client"""
-    def __init__(self, show_window=False, captcha_client=None):
-        LOGGER.info('Initialize, show window: "%s", captcha client: "%s"',
-                show_window, bool(captcha_client)
+    def __init__(self, show_window=False, captcha_key=None):
+        LOGGER.info('Initialize, show window: "%s", captcha key: "%s"',
+                show_window, bool(captcha_key)
             )
         self.show_window = show_window
-        self.captcha_client = captcha_client
+        if captcha_key:
+            self.captcha_client = AnticaptchaClient(captcha_key)
+        else:
+            self.captcha_client = None
         self.login_method = None
         self.username = None
         self.password = None
@@ -79,11 +82,8 @@ class AuthenticationHandler:
 
     def login(self):
         """Login"""
-        auth_text = requests.get("https://rivalregions.com").text
-        browser = Browser(showWindow=self.show_window)
         browser = LOGIN_METHOD_DICT[self.login_method](
-                browser,
-                auth_text,
+                self.show_window,
                 self.username,
                 self.password,
                 self.captcha_client
@@ -114,7 +114,7 @@ class AuthenticationHandler:
         if not self.session:
             raise NoLogginException()
 
-        browser = Browser(showWindow=self.show_window)
+        browser = Browser(self.show_window, DATA_DIR, self.username)
         browser.go_to('https://rivalregions.com/')
         for cookie_name, value in \
                 self.session.cookies.get_dict().items():

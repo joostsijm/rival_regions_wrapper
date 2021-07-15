@@ -24,7 +24,7 @@ If you are unsure middleware to use, then it is advised to implement LocalAuthen
 
 LocalAuthentication is used to login in directly into Rival Regions using supported login methods.
 When running into issues with login then I would appreciate if you could help me resolve the issue. 
-Available login methods: google (supported), vk (may work, never tested), facebook (may work, never tested)
+Available login methods: Google (supported), vk (may work, never tested), facebook (may work, never tested)
 Use username, password, and login method to log in local instance of the authenticator.
 
 RemoteAuthentication connects through a remote API using URL and authentication key.
@@ -34,6 +34,28 @@ There is a wrapper available for the following entities:
 article, conference, craft, language\_chat, market, overview, perks, profile, resource_state, storage, war, work
 For now there is limited documentation how to use the wrapper classes.
 Read the files [here](https://github.com/joostsijm/rival_regions_wrapper/tree/dev/src/rival_regions_wrapper/wrapper) to see how they work.
+
+## Problems
+### This browser or app may not be secure
+Probably the most common problems you may encounter will be about authentication your account.
+In some cases for Google accounts while logging in the browser automation tools are detected.
+After submitting the google username it gets a prompt that says: "This browser or app may not be secure".
+To resolve this problem it is required to run the library with the `show_window` option, when you start the library it will show a Google Chrome window.
+This is required because you will have to fill in your loggin credentials by yourself.
+It is only required once, because from then on your Google authentication is saved in the Chrome profile.
+
+1. To start the library with `show_window` option, add `True` to the initializing of the LocalAuthentication class, like this: `LocalAuthentication(True)`.
+2. Start your application, you will see a Google Chrome window what fills in your username.
+4. After submitting your username you see the error message, and a new tab opens.
+5. In the new tab log into your Google account.
+6. After sucessfully loggin in wait until Google Chrome closes.
+
+From now on you should be able to use your Google account with the library without a problem.
+You can disable the library show\_window option by removing `True` when calling the `LocalAuthentication`.
+
+### Captcha
+When loggin in to your Google account makes you fill out a captcha you can use [anti-captcha](https://anti-captcha.com/) service to circumvent them. 
+Put the key into the LocalAuthenticator after the show\_window option, like this: `LocalAuthentication(False, <ant_captcha_key>)`.
 
 ## Examples
 Create LocalAuthentication middleware and log in using environ variables.

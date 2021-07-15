@@ -2,9 +2,6 @@
 Browser module
 """
 
-import os
-import errno
-
 from selenium_stealth import stealth
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -12,33 +9,9 @@ import webbot
 
 
 class Browser(webbot.Browser):
-    """
-    **Constructor**
+    """Browser class"""
+    def __init__(self, show_window=True, data_dir='chrome', username='Profile 1'):
 
-
-    :__init__(showWindow = True , proxy = None):
-        The constructor takes showWindow flag as argument which Defaults
-                to False. If it is set to true , all browser happen without
-                showing up any GUI window .
-
-        :Args:
-            - showWindow : If true , will run a headless browser without
-                    showing GUI window.
-            - proxy : Url of any optional proxy server.
-
-
-
-    Object attributes:  Key , errors
-
-    :Key:
-        - It contains the constants for all the special keys in the keyboard
-                which can be used in the *press* method
-    errors:
-        - List containing all the errors which might have occurred during
-                performing an action like click ,type etc.
-    """
-    def __init__(self, showWindow=True, proxy=None, downloadPath=None):
-        super().__init__(showWindow, proxy, downloadPath)
         options = webdriver.ChromeOptions()
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--no-sandbox")
@@ -50,21 +23,10 @@ class Browser(webbot.Browser):
                 "excludeSwitches", ["enable-automation"]
             )
         options.add_experimental_option('useAutomationExtension', False)
-        if downloadPath is not None and isinstance(downloadPath, str):
-            absolute_path = os.path.abspath(downloadPath)
-            if not os.path.isdir(absolute_path):
-                raise FileNotFoundError(
-                        errno.ENOENT, os.strerror(errno.ENOENT), absolute_path
-                    )
+        options.add_argument("--user-data-dir={}/chrome".format(data_dir))
+        options.add_argument("--profile-directory={}".format(username))
 
-            options.add_experimental_option(
-                    'prefs', {'download.default_directory': absolute_path}
-                )
-
-        if proxy is not None and isinstance(proxy, str):
-            options.add_argument("--proxy-server={}".format(proxy))
-
-        if not showWindow:
+        if not show_window:
             options.headless = True
 
         self.driver = webdriver.Chrome(options=options)
