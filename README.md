@@ -53,6 +53,9 @@ It is only required once, because from then on your Google authentication is sav
 From now on you should be able to use your Google account with the library without a problem.
 You can disable the library show\_window option by removing `True` when calling the `LocalAuthentication`.
 
+When you face this issue on a headless server it can be solved by copying the Google Chrome profile from your local machine to the server.
+The profile is located in the following directory on Linux: `~/.local/share/rival_regions_wrapper/chrome/`.
+
 ### Captcha
 When loggin in to your Google account makes you fill out a captcha you can use [anti-captcha](https://anti-captcha.com/) service to circumvent them. 
 Put the key into the LocalAuthenticator after the show\_window option, like this: `LocalAuthentication(False, <ant_captcha_key>)`.
