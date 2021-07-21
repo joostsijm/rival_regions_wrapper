@@ -28,10 +28,10 @@ def session_handler(func):
             ConnectionResetError,
         ):
             CookieHandler.remove_cookie(instance.username)
-            instance.login()
+            instance.authenticate()
             return try_run(instance, func, *args, **kwargs)
         except NoLogginException:
-            instance.login()
+            instance.authenticate()
             return try_run(instance, func, *args, **kwargs)
 
     return wrapper

@@ -39,6 +39,10 @@ class LocalAuthentication(MiddlewareBase):
         )
         return self
 
+    def authenticate(self):
+        """Authenticate handler"""
+        self.authentication_handler.authenticate()
+
     def get(self, path, add_var_c=False):
         """Send get requests"""
         return api.get(self, path, add_var_c)
