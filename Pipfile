@@ -7,8 +7,6 @@ verify_ssl = true
 python-dotenv = "*"
 pytest = "*"
 pytest-vcr = "*"
-tox = "*"
-tox-venv = "*"
 pylint = "*"
 
 [packages]
