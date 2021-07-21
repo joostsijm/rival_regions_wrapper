@@ -8,15 +8,18 @@ import json
 from rival_regions_wrapper import LOGGER, DATA_DIR
 
 
-class CookieHandler():
+class CookieHandler:
     """Cookie handler class"""
+
     @classmethod
     def write_cookies(cls, username, passed_cookies):
         """Write cookie to file"""
         LOGGER.info('"%s": Saving cookie', username)
         cookies = None
         try:
-            with open('{}/cookies.json'.format(DATA_DIR), 'r') as cookies_file:
+            with open(
+                "{}/cookies.json".format(DATA_DIR), "r"
+            ) as cookies_file:
                 cookies = json.load(cookies_file)
             if not cookies:
                 raise FileNotFoundError
@@ -25,12 +28,12 @@ class CookieHandler():
         if username not in cookies:
             cookies[username] = {}
         for cookie in passed_cookies:
-            cookies[username][cookie['name']] = {
-                'expiry': cookie['expires'],
-                'value': cookie['value'],
+            cookies[username][cookie["name"]] = {
+                "expiry": cookie["expires"],
+                "value": cookie["value"],
             }
 
-        with open('{}/cookies.json'.format(DATA_DIR), 'w+') as cookies_file:
+        with open("{}/cookies.json".format(DATA_DIR), "w+") as cookies_file:
             json.dump(cookies, cookies_file)
         LOGGER.info('"%s": Saved cookie', username)
 
@@ -40,25 +43,29 @@ class CookieHandler():
         LOGGER.info('"%s": Searching for cookie', username)
         cookies = []
         try:
-            with open('{}/cookies.json'.format(DATA_DIR), 'r') as cookies_file:
+            with open(
+                "{}/cookies.json".format(DATA_DIR), "r"
+            ) as cookies_file:
                 cookies_data = json.load(cookies_file)
                 for cookie_username, user_cookies in cookies_data.items():
                     if cookie_username == username:
                         LOGGER.info('"%s": Found cookie', username)
                         for cookie_name, cookie in user_cookies.items():
                             expires = datetime.fromtimestamp(
-                                    int(cookie['expiry'])
-                                )
+                                int(cookie["expiry"])
+                            )
                             if datetime.now() >= expires:
                                 LOGGER.info(
-                                        '"%s": Cookie is expired', username
-                                    )
+                                    '"%s": Cookie is expired', username
+                                )
                                 return cookies
-                            cookies.append(cls.create_cookie(
-                                cookie_name,
-                                cookie['expiry'],
-                                cookie['value'],
-                            ))
+                            cookies.append(
+                                cls.create_cookie(
+                                    cookie_name,
+                                    cookie["expiry"],
+                                    cookie["value"],
+                                )
+                            )
                         return cookies
         except FileNotFoundError:
             pass
@@ -70,12 +77,14 @@ class CookieHandler():
         LOGGER.info('"%s": Removing cookie', username)
         cookies = None
         try:
-            with open('{}/cookies.json'.format(DATA_DIR), 'r') as cookies_file:
+            with open(
+                "{}/cookies.json".format(DATA_DIR), "r"
+            ) as cookies_file:
                 cookies = json.load(cookies_file)
         except FileNotFoundError:
             cookies = {}
         cookies.pop(username, None)
-        with open('{}/cookies.json'.format(DATA_DIR), 'w+') as cookies_file:
+        with open("{}/cookies.json".format(DATA_DIR), "w+") as cookies_file:
             json.dump(cookies, cookies_file)
         LOGGER.info('"%s": Removed cookie', username)
 
@@ -83,10 +92,10 @@ class CookieHandler():
     def create_cookie(name, expiry, value):
         """Create cookie"""
         return {
-            'domain': 'rivalregions.com',
-            'name': name,
-            'path': '/',
-            'secure': False,
-            'expires': expiry,
-            'value': value,
+            "domain": "rivalregions.com",
+            "name": name,
+            "path": "/",
+            "secure": False,
+            "expires": expiry,
+            "value": value,
         }

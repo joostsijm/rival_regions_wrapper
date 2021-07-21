@@ -10,6 +10,7 @@ from rival_regions_wrapper.authentication_handler import AuthenticationHandler
 
 class MiddlewareBase(ABC):
     """Middleware abstract base class"""
+
     username = None
 
     @abstractmethod
@@ -23,18 +24,19 @@ class MiddlewareBase(ABC):
 
 class LocalAuthentication(MiddlewareBase):
     """Local authentication"""
+
     def __init__(self, show_window=False, captcha_client=None):
         super().__init__()
         self.authentication_handler = AuthenticationHandler(
-                show_window, captcha_client
-            )
+            show_window, captcha_client
+        )
 
     def set_credentials(self, username, password, login_method):
         """Set login credentials"""
         self.username = username
         self.authentication_handler.set_credentials(
-                login_method, username, password
-            )
+            login_method, username, password
+        )
         return self
 
     def get(self, path, add_var_c=False):
@@ -48,24 +50,23 @@ class LocalAuthentication(MiddlewareBase):
 
 class RemoteAuthentication(MiddlewareBase):
     """Remote authentication"""
+
     def __init__(self, api_url, authentication_key):
         super().__init__()
         self.api_url = api_url
-        self.headers = {
-            'Authorization': authentication_key
-        }
+        self.headers = {"Authorization": authentication_key}
 
     def get(self, path, add_var_c=False):
         """Send get requests"""
         try:
             response = requests.get(
-                '{}{}'.format(self.api_url, path), headers=self.headers
+                "{}{}".format(self.api_url, path), headers=self.headers
             )
             return response.text
         except requests.exceptions.Timeout:
-            print('timeout')
+            print("timeout")
         except requests.exceptions.RequestException as exception:
-            print('request exception')
+            print("request exception")
             raise SystemExit(exception) from exception
         return None
 
@@ -73,12 +74,12 @@ class RemoteAuthentication(MiddlewareBase):
         """Send post request"""
         try:
             response = requests.post(
-                '{}{}'.format(self.api_url, path), headers=self.headers
+                "{}{}".format(self.api_url, path), headers=self.headers
             )
             return response.text
         except requests.exceptions.Timeout:
-            print('timeout')
+            print("timeout")
         except requests.exceptions.RequestException as exception:
-            print('request exception')
+            print("request exception")
             raise SystemExit(exception) from exception
         return None
