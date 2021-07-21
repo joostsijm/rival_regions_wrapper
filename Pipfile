@@ -8,6 +8,8 @@ python-dotenv = "*"
 pytest = "*"
 pytest-vcr = "*"
 pylint = "*"
+build = "*"
+twine = "*"
 
 [packages]
 appdirs = "*"
