@@ -359,6 +359,26 @@ def test_work_info(middleware):
     assert isinstance(response['work_exp'], dict), "Work exp should be a dict"
 
 
+@pytest.mark.skip(reason = 'In progress')
+def test_work_do_work(middleware):
+    response = Work(middleware).work()
+    if not response:
+        assert isinstance(response ,bool), "Should be False if can't work"
+    else:
+        assert isinstance(response['factory'], str), "The factory should be a string with name"
+        assert isinstance(response['factory_type'], str), "The factory type should be a string of factory type"
+        assert isinstance(response['income'][0], int), "The income first index should be a integer"
+        assert isinstance(response['income'][1], str), "The income second index should be a string of units"
+
+
+@pytest.mark.skip(reason = 'In progress')
+@pytest.mark.vcr()
+def test_switch_factory(middleware):
+    response = Work(middleware).switch_factory('00000000')
+    # TODO make better tests here
+    assert isinstance(response, str), "The response should be a string 'will be 'ok' if switch successful'"
+
+
 @pytest.fixture
 def article_keys():
     """Standard key fro article"""

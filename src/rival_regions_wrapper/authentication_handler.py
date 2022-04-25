@@ -30,16 +30,19 @@ LOGIN_METHOD_DICT = {
 class AuthenticationHandler:
     """class for RR client"""
 
-    def __init__(self, show_window=False, captcha_key=None, debug=False):
+    def __init__(self, show_window=False, captcha_key=None, debug=False, new_cookie=False):
         LOGGER.info(
-                'Initialize, show window: "%s", captcha key: "%s", debug: %s',
-                show_window, bool(captcha_key), debug
+                'Initialize, show window: "%s", captcha key: "%s",'
+                'debug: %s, new_cookie: %s',
+                show_window, bool(captcha_key), debug, new_cookie
             )
         self.show_window = show_window
         self.captcha_client = None
         if captcha_key:
             self.captcha_client = AnticaptchaClient(captcha_key)
         self.debug = debug
+        self.new_cookie = new_cookie
+
         self.login_method = None
         self.username = None
         self.password = None
@@ -62,9 +65,9 @@ class AuthenticationHandler:
         """Login user if needed"""
         LOGGER.info('"%s": start authentication', self.username)
         cookies = CookieHandler.get_cookies(self.username)
-        if not cookies:
+        if not cookies or self.new_cookie:
             LOGGER.info(
-                '"%s": No (valid) cookie found, start new login',
+                '"%s": No (valid) cookie found or cookie requested, start new login',
                 self.username,
             )
             cookies = self.login()

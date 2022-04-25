@@ -146,9 +146,9 @@ def profile_id():
 @pytest.fixture(scope="module")
 def middleware():
     """Set up wrapper before test"""
-    username = os.environ.get('USERNAME', None)
-    password = os.environ.get('PASSWORD', None)
-    login_method = os.environ.get('LOGIN_METHOD', None)
+    username = os.environ.get('RR_USERNAME', None)
+    password = os.environ.get('RR_PASSWORD', None)
+    login_method = os.environ.get('RR_LOGIN_METHOD', None)
     debug = os.environ.get('DEBUG', None)
     captcha_key = os.environ.get('CAPTCHA_KEY', None)
     if None in (username, password, login_method):
@@ -157,7 +157,7 @@ def middleware():
             'USERNAME, PASSWORD, LOGIN_METHOD'
         )
     _middleware = LocalAuthentication(
-            False, AnticaptchaClient(captcha_key), debug
+            False, AnticaptchaClient(captcha_key), debug, True
         )
     return _middleware.set_credentials(
             username, password, login_method

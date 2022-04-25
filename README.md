@@ -25,6 +25,24 @@ If you are unsure middleware to use, then it is advised to implement LocalAuthen
 LocalAuthentication is used to login in directly into Rival Regions using supported login methods.
 When running into issues with login then I would appreciate if you could help me resolve the issue. 
 Available login methods: Google (supported), vk (may work, never tested), facebook (may work, never tested)
+
+r# Login methods
+Currently the working login methods are Google and VK.
+If you can help me out and make the other login methods working it would be appreciated. 
+
+login methods:
+
+- google [working]
+- vk [working]
+- facebook
+
+## Middleware
+The API wrapper uses middleware to decide where how to send the request.
+Middlewares can also be used to write direct requests to Rival Regions.
+
+Current middleware
+
+### LocalAuthentication
 Use username, password, and login method to log in local instance of the authenticator.
 
 RemoteAuthentication connects through a remote API using URL and authentication key.
@@ -68,9 +86,9 @@ from rival_regions_wrapper.middleware import LocalAuthentication
 
 authentication = LocalAuthentication()
 authentication.set_credentials(
-  os.environ["USERNAME"],
-  os.environ["PASSWORD"],
-  os.environ["LOGIN_METHOD"]
+  os.environ["RR_USERNAME"],
+  os.environ["RR_PASSWORD"],
+  os.environ["RR_LOGIN_METHOD"]
 )
 ```
 
@@ -107,9 +125,9 @@ Replace `PLACEHOLDER` with your credentials.
 
 Required environ variables:
 ```
-USERNAME=PLACEHOLDER
-PASSWORD=PLACEHOLDER
-LOGIN_METHOD=PLACEHOLDER
+RR_USERNAME=PLACEHOLDER
+RR_PASSWORD=PLACEHOLDER
+RR_LOGIN_METHOD=PLACEHOLDER
 ```
 
 There are several optional environ variables, as you can see here with some example value. 
@@ -126,7 +144,7 @@ PROFILE_ID=2000340574
 MESSAGE=test
 ```
 
-In case you want to use the anti-caption service you can fill in the key in `CAPTCHA_KEY`.
+In case you want to use the anti-captcha service you can fill in the key in `CAPTCHA_KEY`.
 Other variables are required to run test that are skipped by default.
 These test are skipped because the test sends out a request that makes change to Rival Regions, like sending messages, or crafting items.
 You can run those these test by changing the appropiate environ variable and adding the `--no-skip` parameter.
