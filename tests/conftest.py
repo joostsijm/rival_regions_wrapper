@@ -47,60 +47,100 @@ def vcr(vcr):
 @pytest.fixture(scope="module")
 def conference_id():
     """Get conference id from environ variable"""
-    return os.environ.get('CONFERENCE_ID', None)
+    value = os.environ.get('CONFERENCE_ID', None)
+    if not value:
+        raise Exception(
+            'Load the following variable in your user environment: CONFERENCE_ID'
+        )
+    return value
 
 
 @pytest.fixture(scope="module")
 def message():
     """Get message from environ variable"""
-    return os.environ.get('MESSAGE', None)
+    value = os.environ.get('MESSAGE', None)
+    if not value:
+        raise Exception(
+            'Load the following variable in your user environment: MESSAGE'
+        )
+    return value
 
 
 @pytest.fixture(scope="module")
 def conference_title():
     """Get conference title from environ variable"""
-    return os.environ.get('CONFERENCE_TITLE', None)
+    value = os.environ.get('CONFERENCE_TITLE', None)
+    if not value:
+        raise Exception(
+            'Load the following variable in your user environment: CONFERENCE_TITLE'
+        )
+    return value
 
 
 @pytest.fixture(scope="module")
 def language_chat():
     """Get language chat from environ varriable"""
-    return os.environ.get('LANGUAGE_CHAT', None)
+    value = os.environ.get('LANGUAGE_CHAT', None)
+    if not value:
+        raise Exception(
+            'Load the following variable in your user environment: LANGUAGE_CHAT'
+        )
+    return value
 
 
 @pytest.fixture(scope="module")
 def perk():
     """Get perk from environ varriable"""
-    return os.environ.get('PERK', None)
+    value = os.environ.get('PERK', None)
+    if not value:
+        raise Exception(
+            'Load the following variable in your user environment: PERK'
+        )
+    return value
 
 
 @pytest.fixture(scope="module")
 def perk_upgrade_type():
     """Get perk upgrade type from environ varriable"""
-    return os.environ.get('PERK_UPGRADE_TYPE', None)
-
-
-def perk_upgrade_type():
-    """Get perk upgrade type from environ varriable"""
-    return os.environ.get('PERK_UPGRADE_TYPE', None)
+    value = os.environ.get('PERK_UPGRADE_TYPE', None)
+    if not value:
+        raise Exception(
+            'Load the following variable in your user environment: PERK_UPGRADE_TYPE'
+        )
+    return value
 
 
 @pytest.fixture(scope="module")
 def craft_item():
     """Get craft item from environ varriable"""
-    return os.environ.get('CRAFT_ITEM', None)
+    value = os.environ.get('CRAFT_ITEM', None)
+    if not value:
+        raise Exception(
+            'Load the following variable in your user environment: CRAFT_ITEM'
+        )
+    return value
 
 
 @pytest.fixture(scope="module")
 def craft_amount():
     """Get craft amount from environ varriable"""
-    return os.environ.get('CRAFT_AMOUNT', None)
+    value = os.environ.get('CRAFT_AMOUNT', None)
+    if not value:
+        raise Exception(
+            'Load the following variable in your user environment: CRAFT_AMOUNT'
+        )
+    return value
 
 
 @pytest.fixture(scope="module")
 def profile_id():
     """Get profile id from environ varriable"""
-    return os.environ.get('PROFILE_ID', None)
+    value = os.environ.get('PROFILE_ID', None)
+    if not value:
+        raise Exception(
+            'Load the following variable in your user environment: PROFILE_ID'
+        )
+    return value
 
 
 @pytest.fixture(scope="module")
@@ -109,14 +149,15 @@ def middleware():
     username = os.environ.get('USERNAME', None)
     password = os.environ.get('PASSWORD', None)
     login_method = os.environ.get('LOGIN_METHOD', None)
+    debug = os.environ.get('DEBUG', None)
     captcha_key = os.environ.get('CAPTCHA_KEY', None)
     if None in (username, password, login_method):
         raise MissingAuthenticationError(
             'Load the following variables in your user environment: '
-            'username, password, login_method'
+            'USERNAME, PASSWORD, LOGIN_METHOD'
         )
     _middleware = LocalAuthentication(
-            False, AnticaptchaClient(captcha_key)
+            False, AnticaptchaClient(captcha_key), debug
         )
     return _middleware.set_credentials(
             username, password, login_method

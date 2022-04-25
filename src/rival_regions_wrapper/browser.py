@@ -85,5 +85,9 @@ class Browser(webbot.Browser):
         self.add_cookie(cookie)
 
     def refresh(self):
-        """To pretent lint error"""
+        """To prevent lint error"""
         self.refresh()
+
+    def get_screenshot_as_file(self, filename):
+        """To prevent lint error"""
+        self.get_screenshot_as_file(filename)

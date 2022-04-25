@@ -14,13 +14,18 @@ from rival_regions_wrapper.exceptions import (
 )
 
 
+# to write page source to html file
+# with open('source.html', 'w') as source:
+#     source.write(browser.get_page_source())
+
+
 # This should be working
-def login_google(show_window, username, password, captcha_client=None):
+def login_google(show_window, username, password, captcha_client=None, debug=False):
     """login using Google"""
     browser = Browser(show_window, DATA_DIR, "g_{}".format(username))
     LOGGER.info('Google: "%s": Login start', username)
     try:
-        # browser = Browser(show_window, DATA_DIR, 'g_{}'.format(username))
+        browser = Browser(show_window, DATA_DIR, 'g_{}'.format(username))
         browser.go_to("https://rivalregions.com/")
         google_login_link = browser.driver.find_element_by_css_selector(
             ".sa_link.gogo"
@@ -31,33 +36,43 @@ def login_google(show_window, username, password, captcha_client=None):
         LOGGER.info('Google: "%s": still RR session active', username)
         return browser
 
-    # browser.get_screenshot_as_file('test_1.png')
+    if debug:
+        browser.get_screenshot_as_file('test_1.png')
 
     if browser.driver.find_elements_by_css_selector("#gold"):
         LOGGER.info('Google: "%s": account already logged in', username)
         return browser
 
-    LOGGER.info('Google: "%s": Typing in username', username)
-    if not browser.driver.find_elements_by_css_selector("#Email"):
-        LOGGER.info('Google: "%s": problem with fill in password', username)
-        raise LoginException() from NoSuchElementException
-    browser.type(username, css_selector="#Email")
+    if browser.driver.find_elements_by_css_selector("#choose-account-0"):
+        LOGGER.info('Google: "%s": account is logged out', username)
+        browser.click(css_selector="#choose-account-0")
 
-    # browser.get_screenshot_as_file('test_2.png')
+        if debug:
+            browser.get_screenshot_as_file('test_2.png')
+    else:
+        LOGGER.info('Google: "%s": Typing in username', username)
+        if not browser.driver.find_elements_by_css_selector("#Email"):
+            LOGGER.info('Google: "%s": problem with fill in email', username)
+            raise LoginException() from NoSuchElementException
+        browser.type(username, css_selector="#Email")
 
-    LOGGER.info('Google: "%s": pressing next button', username)
-    browser.click(css_selector="#next")
-    time.sleep(0.5)
+        if debug:
+            browser.get_screenshot_as_file('test_3.png')
 
-    # browser.get_screenshot_as_file('test_3.png')
+        LOGGER.info('Google: "%s": pressing next button', username)
+        browser.click(css_selector="#next")
+        time.sleep(0.5)
+
+        if debug:
+            browser.get_screenshot_as_file('test_4.png')
 
     while browser.driver.find_elements_by_css_selector("#captcha-box"):
         LOGGER.info('Google: "%s": Captcha present', username)
         if not captcha_client:
             raise NoCaptchaClientException()
-        captcha_url = browser.find_elements(css_selector="#captcha-img img")[
-            0
-        ].get_attribute("src")
+        captcha_url = browser.find_elements(
+                css_selector="#captcha-img img"
+            )[0].get_attribute("src")
         LOGGER.debug('Google: "%s": Captcha url: "%s"', username, captcha_url)
         image = requests.get(captcha_url, stream=True).raw
         image.decode_content = True
@@ -74,7 +89,8 @@ def login_google(show_window, username, password, captcha_client=None):
         browser.click(css_selector="#next")
         time.sleep(0.5)
 
-        # browser.get_screenshot_as_file('test_4.png')
+        if debug:
+            browser.get_screenshot_as_file('test_5.png')
 
     if not browser.driver.find_elements_by_css_selector("#password"):
         LOGGER.info('Google: "%s": browser security issue', username)
@@ -90,19 +106,18 @@ def login_google(show_window, username, password, captcha_client=None):
             return browser
         raise LoginException()
 
-    # with open('source.html', 'w') as source:
-    #     source.write(browser.get_page_source())
-
     LOGGER.info('Google: "%s": Typing in password', username)
     browser.type(password, css_selector="input")
 
-    # browser.get_screenshot_as_file('test_5.png')
+    if debug:
+        browser.get_screenshot_as_file('test_6.png')
 
     LOGGER.info('Google: "%s": pressing sign in button', username)
     browser.click(css_selector="#submit")
     time.sleep(0.5)
 
-    # browser.get_screenshot_as_file('test_6.png')
+    if debug:
+        browser.get_screenshot_as_file('test_7.png')
 
     return browser
 
