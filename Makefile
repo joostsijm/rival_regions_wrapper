@@ -10,3 +10,6 @@ build:
 
 upload:
 	pipenv run python -m twine upload dist/*
+
+test:
+	pipenv run pytest
