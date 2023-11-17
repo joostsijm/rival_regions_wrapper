@@ -56,7 +56,6 @@ class AuthenticationHandler:
         self.login_method = login_method
         self.username = username
         self.password = password
-        self.authenticate()
 
     def authenticate(self):
         """Login user if needed"""

@@ -76,7 +76,6 @@ class Browser(webbot.Browser):
             "start_client",
             "start_session",
             "stop_client",
-            "switch_to_alert",
         ]:
             setattr(self, function, getattr(self.driver, function))
 
